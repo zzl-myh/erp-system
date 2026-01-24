@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+
+# 环境配置（重要：不要提交敏感信息）
+.env
+.env.local
+.env.production
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker
+mysql_data/
+redis_data/
+
+# 日志
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.bak
