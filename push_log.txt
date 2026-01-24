@@ -34,3 +34,9 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M erp_common/exceptions.py
  M push_log.txt
 提交信息: 1 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 8271373] 1
+ 2 files changed, 12 insertions(+)
+执行: git push origin master 
+fatal: unable to access 'https://github.com/zzl-myh/erp-system.git/': Recv failure: Connection was reset
+[错误] git push 失败 
