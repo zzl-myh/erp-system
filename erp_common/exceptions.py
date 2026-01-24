@@ -151,3 +151,7 @@ class PoAlreadyStockedInError(BusinessError):
             status_code=409,
             data={"po_id": po_id}
         )
+
+
+# 别名，兼容旧代码
+BusinessException = BusinessError
