@@ -20,3 +20,9 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M services/stock_service/Dockerfile
  M services/user_service/Dockerfile
 提交信息: 镜像加速地址 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 99b0989] 镜像加速地址
+ 11 files changed, 54 insertions(+), 19 deletions(-)
+执行: git push origin master 
+fatal: unable to access 'https://github.com/zzl-myh/erp-system.git/': Empty reply from server
+[错误] git push 失败 
