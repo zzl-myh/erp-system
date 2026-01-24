@@ -63,15 +63,69 @@ sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 ```
 
-### 2.2 第二阶段：获取项目代码
+### 2.2 第二阶段：安装 Git 并获取项目代码
 
+#### 2.2.1 安装 Git
 ```bash
-# 克隆项目（如果是 Git 仓库）
-git clone <your-repo-url> /opt/erp
+# Ubuntu/Debian
+sudo apt update
+sudo apt install -y git
+
+# CentOS/RHEL
+sudo yum install -y git
+
+# 验证安装
+git --version
+```
+
+#### 2.2.2 配置 Git（首次使用）
+```bash
+# 配置用户信息
+git config --global user.name "zzl-myh"
+git config --global user.email "your_email@example.com"
+
+# 配置换行符处理（Linux 服务器）
+git config --global core.autocrlf input
+
+# 查看配置
+git config --list
+```
+
+#### 2.2.3 配置 SSH 密钥（推荐，免密拉取）
+```bash
+# 生成 SSH 密钥
+ssh-keygen -t ed25519 -C "your_email@example.com"
+# 一路回车使用默认配置
+
+# 查看公钥
+cat ~/.ssh/id_ed25519.pub
+
+# 将公钥添加到 GitHub:
+# 1. 登录 GitHub → Settings → SSH and GPG keys → New SSH key
+# 2. 粘贴公钥内容并保存
+
+# 测试 SSH 连接
+ssh -T git@github.com
+# 成功提示: Hi zzl-myh! You've successfully authenticated...
+```
+
+#### 2.2.4 克隆项目代码
+```bash
+# 创建项目目录
+sudo mkdir -p /opt/erp
+sudo chown $USER:$USER /opt/erp
+
+# 方式一：使用 SSH 克隆（推荐，需先配置 SSH 密钥）
+git clone git@github.com:zzl-myh/erp-system.git /opt/erp
+
+# 方式二：使用 HTTPS 克隆（每次拉取需输入密码）
+git clone https://github.com/zzl-myh/erp-system.git /opt/erp
+
+# 进入项目目录
 cd /opt/erp
 
-# 或者直接进入项目目录
-cd /path/to/ERP
+# 查看分支
+git branch -a
 ```
 
 ### 2.3 第三阶段：修改敏感配置（重要！）
@@ -80,11 +134,11 @@ cd /path/to/ERP
 ```bash
 # 生成 JWT 密钥（32字符以上）
 openssl rand -hex 32
-# 输出示例：a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6
+# 输出示例：a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm
 
 # 生成数据库密码
 openssl rand -base64 16
-# 输出示例：X7kL9mP2qR5tY8wZ
+# 输出示例：X7kL9mP2qR5tlyzm
 ```
 
 #### 2.3.2 修改 docker-compose.yml
@@ -107,9 +161,9 @@ vim docker-compose.yml
 #### 2.3.3 使用 sed 批量替换（可选）
 ```bash
 # 定义您的密码和密钥
-DB_PASSWORD="您的数据库密码"
-REDIS_PASSWORD="您的Redis密码"
-JWT_KEY="您的JWT密钥"
+DB_PASSWORD="您的mysql数据库密码"
+REDIS_PASSWORD="您的redis数据库密码"
+JWT_KEY="您的密钥"
 
 # 批量替换数据库密码
 sed -i "s/MYSQL_ROOT_PASSWORD: password/MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}/g" docker-compose.yml
@@ -271,7 +325,120 @@ curl -X POST http://localhost/item/create \
   -d '{"name": "测试商品", "category_id": 1, "price": 99.00}'
 ```
 
-### 2.7 常用运维命令
+### 2.7 第七阶段：Git 更新与部署
+
+#### 2.7.1 手动拉取更新
+```bash
+cd /opt/erp
+
+# 查看远程更新
+git fetch origin
+git log HEAD..origin/main --oneline
+
+# 拉取最新代码
+git pull origin main
+
+# 重新构建并启动服务
+docker-compose build
+docker-compose up -d
+```
+
+#### 2.7.2 创建自动部署脚本
+```bash
+cat > /opt/erp/deploy.sh << 'EOF'
+#!/bin/bash
+# ERP 系统自动部署脚本
+
+set -e
+PROJECT_DIR="/opt/erp"
+BRANCH="main"
+
+echo "========== 开始部署 =========="
+cd $PROJECT_DIR
+
+# 拉取最新代码
+echo "正在拉取最新代码..."
+git fetch origin $BRANCH
+
+# 检查是否有更新
+LOCAL=$(git rev-parse HEAD)
+REMOTE=$(git rev-parse origin/$BRANCH)
+
+if [ "$LOCAL" = "$REMOTE" ]; then
+    echo "代码已是最新，无需更新"
+    exit 0
+fi
+
+echo "发现新提交:"
+git log --oneline HEAD..origin/$BRANCH
+
+# 拉取代码
+git pull origin $BRANCH
+
+# 重新构建并启动
+echo "重新构建服务..."
+docker-compose build
+docker-compose up -d
+
+# 清理旧镜像
+docker image prune -f
+
+echo "========== 部署完成 =========="
+echo "当前版本: $(git rev-parse --short HEAD)"
+EOF
+
+chmod +x /opt/erp/deploy.sh
+```
+
+#### 2.7.3 使用部署脚本
+```bash
+# 执行部署
+cd /opt/erp
+./deploy.sh
+```
+
+#### 2.7.4 Windows 端一键推送并部署
+在 Windows 项目目录创建 `deploy_remote.bat`：
+```batch
+@echo off
+chcp 65001 >nul
+echo ========== ERP 一键部署 ==========
+
+set SERVER=用户名@服务器IP
+set REMOTE_PATH=/opt/erp
+
+:: 检查是否有更改
+git status --porcelain > temp_status.txt
+set /p STATUS=<temp_status.txt
+del temp_status.txt
+
+if "%STATUS%"=="" (
+    echo 没有需要提交的更改，直接触发远程部署...
+    goto :deploy
+)
+
+echo 待提交的更改:
+git status --short
+echo.
+
+set /p COMMIT_MSG="请输入提交信息: "
+if "%COMMIT_MSG%"=="" set COMMIT_MSG=update: 代码更新
+
+git add .
+git commit -m "%COMMIT_MSG%"
+git push origin main
+
+:deploy
+echo.
+echo 正在触发远程部署...
+ssh %SERVER% "cd %REMOTE_PATH% && ./deploy.sh"
+
+echo.
+echo ========== 部署完成 ==========
+pause
+```
+
+### 2.8 常用运维命令
 
 ```bash
 # 停止所有服务
@@ -293,7 +460,7 @@ docker-compose exec user-service /bin/sh
 docker system prune -f
 ```
 
-### 2.8 防火墙配置（如需外网访问）
+### 2.9 防火墙配置（如需外网访问）
 
 ```bash
 # Ubuntu/Debian (ufw)
@@ -307,7 +474,7 @@ sudo firewall-cmd --permanent --add-port=80/tcp
 sudo firewall-cmd --reload
 ```
 
-### 2.9 设置开机自启
+### 2.10 设置开机自启
 
 ```bash
 # 创建 systemd 服务文件
@@ -338,7 +505,7 @@ sudo systemctl stop erp
 sudo systemctl status erp
 ```
 
-### 2.10 故障排查
+### 2.11 故障排查
 
 ```bash
 # 1. 服务启动失败

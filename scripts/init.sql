@@ -533,12 +533,59 @@ INSERT INTO warehouse (code, name, type, status) VALUES
 ('WH002', '门店仓库', 'BRANCH', 1)
 ON DUPLICATE KEY UPDATE name=VALUES(name);
 
--- 插入默认商品分类
+-- 插入默认商品分类（服装行业）
 INSERT INTO item_category (name, parent_id, level, sort_order) VALUES
-('食品', 0, 1, 1),
-('饮料', 0, 1, 2),
-('日用品', 0, 1, 3),
-('生鲜', 0, 1, 4)
+('上装', 0, 1, 1),
+('下装', 0, 1, 2),
+('外套', 0, 1, 3),
+('鞋类', 0, 1, 4),
+('配饰', 0, 1, 5),
+('内衣', 0, 1, 6)
+ON DUPLICATE KEY UPDATE name=VALUES(name);
+
+-- 上装子分类
+INSERT INTO item_category (name, parent_id, level, sort_order) VALUES
+('T恤', 1, 2, 1),
+('衬衫', 1, 2, 2),
+('卫衣', 1, 2, 3),
+('毛衣', 1, 2, 4),
+('Polo衫', 1, 2, 5)
+ON DUPLICATE KEY UPDATE name=VALUES(name);
+
+-- 下装子分类
+INSERT INTO item_category (name, parent_id, level, sort_order) VALUES
+('牛仔裤', 2, 2, 1),
+('休闲裤', 2, 2, 2),
+('西裤', 2, 2, 3),
+('短裤', 2, 2, 4),
+('裙子', 2, 2, 5)
+ON DUPLICATE KEY UPDATE name=VALUES(name);
+
+-- 外套子分类
+INSERT INTO item_category (name, parent_id, level, sort_order) VALUES
+('夹克', 3, 2, 1),
+('风衣', 3, 2, 2),
+('大衣', 3, 2, 3),
+('羽绒服', 3, 2, 4),
+('西装', 3, 2, 5)
+ON DUPLICATE KEY UPDATE name=VALUES(name);
+
+-- 鞋类子分类
+INSERT INTO item_category (name, parent_id, level, sort_order) VALUES
+('运动鞋', 4, 2, 1),
+('休闲鞋', 4, 2, 2),
+('皮鞋', 4, 2, 3),
+('凉鞋', 4, 2, 4),
+('靴子', 4, 2, 5)
+ON DUPLICATE KEY UPDATE name=VALUES(name);
+
+-- 配饰子分类
+INSERT INTO item_category (name, parent_id, level, sort_order) VALUES
+('帽子', 5, 2, 1),
+('围巾', 5, 2, 2),
+('腰带', 5, 2, 3),
+('包袋', 5, 2, 4),
+('首饰', 5, 2, 5)
 ON DUPLICATE KEY UPDATE name=VALUES(name);
 
 COMMIT;

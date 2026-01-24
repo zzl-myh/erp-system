@@ -23,7 +23,7 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm
       MYSQL_DATABASE: erp
     ports:
       - "3306:3306"
@@ -44,16 +44,16 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-    command: redis-server --requirepass ${REDIS_PASSWORD:-redis123456} --appendonly yes
+    command: redis-server --requirepass ${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm} --appendonly yes
     environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis123456}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}
     volumes:
       - redis_data:/data
     networks:
       - erp-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis123456}", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -93,8 +93,8 @@ services:
       context: .
       dockerfile: services/item_service/Dockerfile
     environment:
-      - DATABASE_URL=mysql+aiomysql://root:password@mysql:3306/erp
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123456}@redis:6379/0
+      - DATABASE_URL=mysql+aiomysql://root:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm@mysql:3306/erp
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}@redis:6379/0
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       mysql:
@@ -113,10 +113,10 @@ services:
       context: .
       dockerfile: services/user_service/Dockerfile
     environment:
-      - DATABASE_URL=mysql+aiomysql://root:password@mysql:3306/erp
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123456}@redis:6379/0
+      - DATABASE_URL=mysql+aiomysql://root:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm@mysql:3306/erp
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}@redis:6379/0
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - JWT_SECRET_KEY=your-secret-key-change-in-production
+      - JWT_SECRET_KEY=X7kL9mP2qR5tlyzm
     depends_on:
       mysql:
         condition: service_healthy
@@ -132,8 +132,8 @@ services:
       context: .
       dockerfile: services/stock_service/Dockerfile
     environment:
-      - DATABASE_URL=mysql+aiomysql://root:password@mysql:3306/erp
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123456}@redis:6379/0
+      - DATABASE_URL=mysql+aiomysql://root:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm@mysql:3306/erp
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}@redis:6379/0
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       mysql:
@@ -152,8 +152,8 @@ services:
       context: .
       dockerfile: services/purchase_service/Dockerfile
     environment:
-      - DATABASE_URL=mysql+aiomysql://root:password@mysql:3306/erp
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123456}@redis:6379/0
+      - DATABASE_URL=mysql+aiomysql://root:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm@mysql:3306/erp
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}@redis:6379/0
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       mysql:
@@ -170,8 +170,8 @@ services:
       context: .
       dockerfile: services/production_service/Dockerfile
     environment:
-      - DATABASE_URL=mysql+aiomysql://root:password@mysql:3306/erp
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123456}@redis:6379/0
+      - DATABASE_URL=mysql+aiomysql://root:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm@mysql:3306/erp
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}@redis:6379/0
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       mysql:
@@ -188,8 +188,8 @@ services:
       context: .
       dockerfile: services/job_service/Dockerfile
     environment:
-      - DATABASE_URL=mysql+aiomysql://root:password@mysql:3306/erp
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123456}@redis:6379/0
+      - DATABASE_URL=mysql+aiomysql://root:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm@mysql:3306/erp
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}@redis:6379/0
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       mysql:
@@ -206,8 +206,8 @@ services:
       context: .
       dockerfile: services/cost_service/Dockerfile
     environment:
-      - DATABASE_URL=mysql+aiomysql://root:password@mysql:3306/erp
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123456}@redis:6379/0
+      - DATABASE_URL=mysql+aiomysql://root:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm@mysql:3306/erp
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}@redis:6379/0
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       mysql:
@@ -224,8 +224,8 @@ services:
       context: .
       dockerfile: services/order_service/Dockerfile
     environment:
-      - DATABASE_URL=mysql+aiomysql://root:password@mysql:3306/erp
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123456}@redis:6379/0
+      - DATABASE_URL=mysql+aiomysql://root:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm@mysql:3306/erp
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}@redis:6379/0
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       mysql:
@@ -244,8 +244,8 @@ services:
       context: .
       dockerfile: services/member_service/Dockerfile
     environment:
-      - DATABASE_URL=mysql+aiomysql://root:password@mysql:3306/erp
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123456}@redis:6379/0
+      - DATABASE_URL=mysql+aiomysql://root:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm@mysql:3306/erp
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}@redis:6379/0
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       mysql:
@@ -262,8 +262,8 @@ services:
       context: .
       dockerfile: services/promo_service/Dockerfile
     environment:
-      - DATABASE_URL=mysql+aiomysql://root:password@mysql:3306/erp
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis123456}@redis:6379/0
+      - DATABASE_URL=mysql+aiomysql://root:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4lyzm@mysql:3306/erp
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-X7kL9mP2qR5tlyzm}@redis:6379/0
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       mysql:
