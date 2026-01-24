@@ -154,3 +154,23 @@ class PoAlreadyStockedInError(BusinessError):
 
 # 别名，兼容旧代码
 BusinessException = BusinessError
+
+
+# ============ 异常处理器 ============
+
+async def business_exception_handler(request, exc: BusinessError):
+    """
+    FastAPI 业务异常处理器
+    用于统一返回业务异常响应
+    """
+    from fastapi.responses import JSONResponse
+    
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "code": exc.code,
+            "message": exc.message,
+            "data": exc.data
+        }
+    )

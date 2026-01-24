@@ -2,6 +2,10 @@
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
+:: 切换到脚本所在目录（解决双击执行时工作目录不对的问题）
+cd /d "%~dp0"
+echo 当前工作目录: %CD%
+
 :: 日志文件
 set LOG_FILE=push_log.txt
 echo ========== %date% %time% ========== >> %LOG_FILE%
@@ -31,16 +35,20 @@ git remote -v >> %LOG_FILE% 2>&1
 :: 检查是否有未提交的更改
 echo.
 echo 检查文件状态...
-git status --porcelain > temp_status.txt
-for %%i in (temp_status.txt) do set SIZE=%%~zi
-if %SIZE% EQU 0 (
+git status --porcelain > temp_status.txt 2>&1
+for %%i in (temp_status.txt) do set "SIZE=%%~zi"
+echo 文件状态大小: !SIZE! 字节
+echo 文件状态大小: !SIZE! 字节 >> %LOG_FILE%
+
+if "!SIZE!"=="" set SIZE=0
+if "!SIZE!"=="0" (
     echo 没有需要提交的更改
     echo 没有需要提交的更改 >> %LOG_FILE%
-    del temp_status.txt
+    del temp_status.txt 2>nul
     pause
     exit /b
 )
-del temp_status.txt
+del temp_status.txt 2>nul
 
 :: 显示更改内容
 echo.
