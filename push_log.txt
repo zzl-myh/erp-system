@@ -3,3 +3,20 @@
 当前分支: master 
 origin	https://github.com/zzl-myh/erp-system.git (fetch)
 origin	https://github.com/zzl-myh/erp-system.git (push)
+========== 周六 2026/01/24 16:41:37.08 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+ M USAGE.md
+ M push_log.txt
+ M services/cost_service/Dockerfile
+ M services/job_service/Dockerfile
+ M services/member_service/Dockerfile
+ M services/order_service/Dockerfile
+ M services/production_service/Dockerfile
+ M services/promo_service/Dockerfile
+ M services/purchase_service/Dockerfile
+ M services/stock_service/Dockerfile
+ M services/user_service/Dockerfile
+提交信息: 镜像加速地址 

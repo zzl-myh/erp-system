@@ -351,7 +351,7 @@ cat > /opt/erp/deploy.sh << 'EOF'
 
 set -e
 PROJECT_DIR="/opt/erp"
-BRANCH="main"
+BRANCH="master"
 
 echo "========== 开始部署 =========="
 cd $PROJECT_DIR
