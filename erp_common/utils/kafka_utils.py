@@ -138,6 +138,50 @@ class KafkaConsumer:
             logger.info(f"Kafka consumer stopped: topic={self.topic}")
 
 
+# ============ 全局 Kafka 生产者管理 ============
+
+_kafka_producer: Optional[KafkaProducer] = None
+
+
+async def init_kafka() -> None:
+    """
+    初始化全局 Kafka 生产者
+    应在应用启动时调用
+    """
+    global _kafka_producer
+    if _kafka_producer is None:
+        _kafka_producer = KafkaProducer()
+        await _kafka_producer.start()
+        logger.info("Global Kafka producer initialized")
+
+
+async def close_kafka() -> None:
+    """
+    关闭全局 Kafka 生产者
+    应在应用关闭时调用
+    """
+    global _kafka_producer
+    if _kafka_producer is not None:
+        await _kafka_producer.stop()
+        _kafka_producer = None
+        logger.info("Global Kafka producer closed")
+
+
+def get_kafka_producer() -> KafkaProducer:
+    """
+    获取全局 Kafka 生产者实例
+    
+    Returns:
+        KafkaProducer: 全局生产者实例
+    
+    Raises:
+        RuntimeError: 如果生产者未初始化
+    """
+    if _kafka_producer is None:
+        raise RuntimeError("Kafka producer not initialized. Call init_kafka() first.")
+    return _kafka_producer
+
+
 # Kafka Topics 定义
 class KafkaTopics:
     """Kafka Topic 常量"""

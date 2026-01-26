@@ -50,3 +50,19 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M push.bat
  M push_log.txt
 提交信息: 1 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 0e90273] 1
+ 3 files changed, 43 insertions(+), 5 deletions(-)
+执行: git push origin master 
+fatal: unable to access 'https://github.com/zzl-myh/erp-system.git/': Recv failure: Connection was reset
+[错误] git push 失败 
+========== 周一 2026/01/26  8:50:59.96 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 98 字节 
+ M erp_common/exceptions.py
+ M erp_common/utils/kafka_utils.py
+ M push_log.txt
+提交信息: 1 
