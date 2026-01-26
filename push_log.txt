@@ -83,3 +83,11 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M push_log.txt
 ?? scripts/health_check.sh
 提交信息: 添加 init_redis, get_redis_client 函数 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/health_check.sh', LF will be replaced by CRLF the next time Git touches it
+[master f84cf0a] 添加 init_redis, get_redis_client 函数
+ 3 files changed, 262 insertions(+), 5 deletions(-)
+ create mode 100644 scripts/health_check.sh
+执行: git push origin master 
+fatal: unable to access 'https://github.com/zzl-myh/erp-system.git/': Could not resolve host: github.com
+[错误] git push 失败 
