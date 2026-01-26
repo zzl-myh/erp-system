@@ -90,7 +90,7 @@ async def business_error_handler(request: Request, exc: BusinessError):
             message=exc.message,
             code=exc.code,
             data=exc.data,
-        ).model_dump(),
+        ).model_dump(mode='json'),
     )
 
 
@@ -110,7 +110,7 @@ async def validation_error_handler(request: Request, exc: RequestValidationError
             message="Validation error",
             code="VALIDATION_ERROR",
             data={"errors": errors},
-        ).model_dump(),
+        ).model_dump(mode='json'),
     )
 
 
@@ -124,7 +124,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         content=Result.fail(
             message="Internal server error",
             code="INTERNAL_ERROR",
-        ).model_dump(),
+        ).model_dump(mode='json'),
     )
 
 
