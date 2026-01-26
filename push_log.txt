@@ -140,3 +140,19 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M services/stock_service/main.py
  M services/user_service/api.py
 提交信息: 修复所有服务的健康检查路由顺序，确保在动态路由之前注册 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 69c2458] 修复所有服务的健康检查路由顺序，确保在动态路由之前注册
+ 11 files changed, 87 insertions(+), 64 deletions(-)
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   9cebb37..69c2458  master -> master
+推送成功 
+========== 周一 2026/01/26  9:40:40.68 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 62 字节 
+ M push_log.txt
+ M scripts/health_check.sh
+提交信息: health检查 

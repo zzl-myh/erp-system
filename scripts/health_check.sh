@@ -166,7 +166,7 @@ API_ENDPOINTS=(
 )
 
 for item in "${API_ENDPOINTS[@]}"; do
-    url="${item%%:*}"
+    url="${item%:*}"  # 使用 % 而不是 %% 避免截断 http://
     name="${item##*:}"
     check_http "$url"
     check_result "$name" $?
