@@ -519,7 +519,7 @@ ON DUPLICATE KEY UPDATE name=VALUES(name);
 
 -- 插入默认管理员用户 (密码: admin123)
 INSERT INTO user (username, password, name, status) VALUES
-('admin', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.I5IAA.1J7KHKCi', '系统管理员', 1)
+('admin', '$2b$12$ReZMWLca4oA50S.Ba0X/heCn.5XrX0jqDVfMoDLAYf0vrjWNhh/2m', '系统管理员', 1)
 ON DUPLICATE KEY UPDATE name=VALUES(name);
 
 -- 关联管理员角色
