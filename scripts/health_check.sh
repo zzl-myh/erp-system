@@ -68,12 +68,23 @@ check_http() {
     fi
 }
 
-# 检测端口
+# 检测端口（兼容多种方式）
 check_port() {
     local host=$1
     local port=$2
-    nc -z -w 3 "$host" "$port" 2>/dev/null
-    return $?
+    
+    # 方式1: 使用 /dev/tcp (bash 内置)
+    (echo >/dev/tcp/$host/$port) 2>/dev/null && return 0
+    
+    # 方式2: 使用 nc
+    nc -z -w 3 "$host" "$port" 2>/dev/null && return 0
+    
+    # 方式3: 使用 curl (HTTP 端口)
+    if [ "$port" == "80" ]; then
+        curl -s --max-time 3 "http://$host:$port" >/dev/null 2>&1 && return 0
+    fi
+    
+    return 1
 }
 
 echo ""
@@ -145,13 +156,13 @@ check_result "Kafka (9092)" $?
 echo ""
 echo -e "${YELLOW}[4] API 健康检测${NC}"
 
-# 通过 Nginx 反向代理检测各服务
+# 通过 Nginx 反向代理检测各服务健康端点
 API_ENDPOINTS=(
-    "http://localhost/api/user/health:用户服务 API"
-    "http://localhost/api/item/health:商品服务 API"
-    "http://localhost/api/stock/health:库存服务 API"
-    "http://localhost/api/order/health:订单服务 API"
-    "http://localhost/api/member/health:会员服务 API"
+    "http://localhost/user/health:用户服务 API"
+    "http://localhost/item/health:商品服务 API"
+    "http://localhost/stock/health:库存服务 API"
+    "http://localhost/order/health:订单服务 API"
+    "http://localhost/member/health:会员服务 API"
 )
 
 for item in "${API_ENDPOINTS[@]}"; do
