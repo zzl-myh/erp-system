@@ -183,18 +183,51 @@ class RedisClient:
 _redis_client: Optional[RedisClient] = None
 
 
-async def get_redis() -> RedisClient:
-    """获取 Redis 客户端单例"""
+async def init_redis() -> None:
+    """
+    初始化全局 Redis 连接
+    应在应用启动时调用
+    """
     global _redis_client
     if _redis_client is None:
         _redis_client = RedisClient()
         await _redis_client.connect()
-    return _redis_client
+        logger.info("Global Redis client initialized")
 
 
-async def close_redis():
-    """关闭 Redis 连接"""
+async def close_redis() -> None:
+    """
+    关闭全局 Redis 连接
+    应在应用关闭时调用
+    """
     global _redis_client
     if _redis_client:
         await _redis_client.close()
         _redis_client = None
+        logger.info("Global Redis client closed")
+
+
+async def get_redis() -> RedisClient:
+    """
+    获取全局 Redis 客户端实例
+    如果未初始化会自动初始化
+    """
+    global _redis_client
+    if _redis_client is None:
+        await init_redis()
+    return _redis_client
+
+
+def get_redis_client() -> RedisClient:
+    """
+    获取全局 Redis 客户端实例（同步版本）
+    
+    Returns:
+        RedisClient: 全局客户端实例
+    
+    Raises:
+        RuntimeError: 如果客户端未初始化
+    """
+    if _redis_client is None:
+        raise RuntimeError("Redis client not initialized. Call init_redis() first.")
+    return _redis_client
