@@ -116,3 +116,9 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M nginx/nginx.conf
  M push_log.txt
 提交信息: 修复健康检查端点配置，使用精确匹配 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 407c9f3] 修复健康检查端点配置，使用精确匹配
+ 2 files changed, 55 insertions(+), 3 deletions(-)
+执行: git push origin master 
+fatal: unable to access 'https://github.com/zzl-myh/erp-system.git/': Failed to connect to github.com port 443 after 21104 ms: Could not connect to server
+[错误] git push 失败 
