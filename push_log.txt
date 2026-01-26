@@ -100,3 +100,19 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M nginx/nginx.conf
  M push_log.txt
 提交信息: 修复 Nginx 上游服务端口配置 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 0bdfb20] 修复 Nginx 上游服务端口配置
+ 2 files changed, 18 insertions(+), 9 deletions(-)
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   421279a..0bdfb20  master -> master
+推送成功 
+========== 周一 2026/01/26  9:20:00.25 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 55 字节 
+ M nginx/nginx.conf
+ M push_log.txt
+提交信息: 修复健康检查端点配置，使用精确匹配 
