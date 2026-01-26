@@ -8,6 +8,7 @@ from typing import List, Optional, Tuple
 
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from erp_common.exceptions import ConflictError, NotFoundError
 from erp_common.schemas.base import PageResult
@@ -148,12 +149,21 @@ class ItemService:
             await self.kafka.send(KafkaTopics.ITEM_EVENTS, event)
         
         logger.info(f"Item created: {item.sku_id} - {item.name}")
-        return item
+        
+        # 重新查询并预加载关系
+        result = await self.db.execute(
+            select(Item)
+            .options(selectinload(Item.skus), selectinload(Item.barcodes))
+            .where(Item.id == item.id)
+        )
+        return result.scalar_one()
     
     async def get_item(self, item_id: int) -> Item:
         """获取商品详情"""
         result = await self.db.execute(
-            select(Item).where(Item.id == item_id)
+            select(Item)
+            .options(selectinload(Item.skus), selectinload(Item.barcodes))
+            .where(Item.id == item_id)
         )
         item = result.scalar_one_or_none()
         
@@ -165,7 +175,9 @@ class ItemService:
     async def get_item_by_sku(self, sku_id: str) -> Item:
         """通过 SKU ID 获取商品"""
         result = await self.db.execute(
-            select(Item).where(Item.sku_id == sku_id)
+            select(Item)
+            .options(selectinload(Item.skus), selectinload(Item.barcodes))
+            .where(Item.sku_id == sku_id)
         )
         item = result.scalar_one_or_none()
         
@@ -178,6 +190,7 @@ class ItemService:
         """通过条码获取商品"""
         result = await self.db.execute(
             select(Item)
+            .options(selectinload(Item.skus), selectinload(Item.barcodes))
             .join(ItemBarcode, Item.id == ItemBarcode.item_id)
             .where(ItemBarcode.barcode == barcode)
         )
@@ -218,7 +231,14 @@ class ItemService:
             await self.kafka.send(KafkaTopics.ITEM_EVENTS, event)
         
         logger.info(f"Item updated: {item.sku_id}")
-        return item
+        
+        # 重新查询并预加载关系
+        result = await self.db.execute(
+            select(Item)
+            .options(selectinload(Item.skus), selectinload(Item.barcodes))
+            .where(Item.id == item.id)
+        )
+        return result.scalar_one()
     
     async def list_items(self, query: ItemQuery) -> PageResult[ItemResponse]:
         """分页查询商品列表"""
@@ -247,8 +267,10 @@ class ItemService:
         total_result = await self.db.execute(count_stmt)
         total = total_result.scalar()
         
-        # 查询数据
-        stmt = select(Item).order_by(Item.id.desc())
+        # 查询数据（预加载关系）
+        stmt = select(Item).options(
+            selectinload(Item.skus), selectinload(Item.barcodes)
+        ).order_by(Item.id.desc())
         if conditions:
             stmt = stmt.where(*conditions)
         stmt = stmt.offset(query.offset).limit(query.size)
