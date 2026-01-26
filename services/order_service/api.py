@@ -39,7 +39,7 @@ async def get_dashboard_stats(
     week_start = today - timedelta(days=today.weekday())  # 本周一
     
     # 商品总数 (查询 item 表)
-    item_result = await db.execute(text("SELECT COUNT(*) FROM item WHERE deleted = 0"))
+    item_result = await db.execute(text("SELECT COUNT(*) FROM item WHERE status = 1"))
     item_count = item_result.scalar() or 0
     
     # 会员总数 (查询 member 表)
