@@ -174,3 +174,20 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M services/item_service/main.py
  M services/user_service/main.py
 提交信息: 修复 model_dump datetime 序列化问题 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 94c2b52] 修复 model_dump datetime 序列化问题
+ 3 files changed, 24 insertions(+), 6 deletions(-)
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   f1d5fac..94c2b52  master -> master
+推送成功 
+========== 周一 2026/01/26  9:49:44.47 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 89 字节 
+ M push_log.txt
+ M pyproject.toml
+ M services/user_service/Dockerfile
+提交信息: 修复 bcrypt 依赖：添加 libffi-dev 和显式 bcrypt 包 
