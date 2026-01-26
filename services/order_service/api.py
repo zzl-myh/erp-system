@@ -34,51 +34,73 @@ async def get_dashboard_stats(
 ):
     """获取仪表盘统计数据"""
     from sqlalchemy import text
+    import logging
+    logger = logging.getLogger(__name__)
     
     today = date.today()
     week_start = today - timedelta(days=today.weekday())  # 本周一
     
-    # 商品总数 (查询 item 表)
-    item_result = await db.execute(text("SELECT COUNT(*) FROM item WHERE status = 1"))
-    item_count = item_result.scalar() or 0
+    # 商品总数
+    try:
+        item_result = await db.execute(text("SELECT COUNT(*) FROM item WHERE status = 1"))
+        item_count = item_result.scalar() or 0
+    except Exception as e:
+        logger.warning(f"查询商品数量失败: {e}")
+        item_count = 0
     
-    # 会员总数 (查询 member 表)
-    member_result = await db.execute(text("SELECT COUNT(*) FROM member WHERE status = 1"))
-    member_count = member_result.scalar() or 0
+    # 会员总数
+    try:
+        member_result = await db.execute(text("SELECT COUNT(*) FROM member WHERE status = 1"))
+        member_count = member_result.scalar() or 0
+    except Exception as e:
+        logger.warning(f"查询会员数量失败: {e}")
+        member_count = 0
     
-    # 今日订单数和销售额
-    today_result = await db.execute(
-        text("""
-            SELECT COUNT(*) as cnt, COALESCE(SUM(total_amount), 0) as total 
-            FROM so_order 
-            WHERE DATE(order_date) = :today AND status != 'CANCELLED'
-        """),
-        {"today": today}
-    )
-    today_row = today_result.fetchone()
-    today_order_count = today_row[0] if today_row else 0
-    today_sales = float(today_row[1]) if today_row else 0
+    # 今日订单数和销售额 (使用 created_at)
+    try:
+        today_result = await db.execute(
+            text("""
+                SELECT COUNT(*) as cnt, COALESCE(SUM(total_amount), 0) as total 
+                FROM so_order 
+                WHERE DATE(created_at) = :today AND status != 'CANCELLED'
+            """),
+            {"today": today}
+        )
+        today_row = today_result.fetchone()
+        today_order_count = today_row[0] if today_row else 0
+        today_sales = float(today_row[1]) if today_row else 0
+    except Exception as e:
+        logger.warning(f"查询今日订单失败: {e}")
+        today_order_count = 0
+        today_sales = 0
     
-    # 本周销售趋势 (近 7 天)
+    # 本周销售趋势
     week_days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     week_sales_trend = []
     
     for i in range(7):
         day = week_start + timedelta(days=i)
-        day_result = await db.execute(
-            text("""
-                SELECT COUNT(*) as cnt, COALESCE(SUM(total_amount), 0) as total
-                FROM so_order
-                WHERE DATE(order_date) = :day AND status != 'CANCELLED'
-            """),
-            {"day": day}
-        )
-        day_row = day_result.fetchone()
-        week_sales_trend.append(SalesTrend(
-            date=week_days[i],
-            amount=float(day_row[1]) if day_row else 0,
-            order_count=day_row[0] if day_row else 0
-        ))
+        try:
+            day_result = await db.execute(
+                text("""
+                    SELECT COUNT(*) as cnt, COALESCE(SUM(total_amount), 0) as total
+                    FROM so_order
+                    WHERE DATE(created_at) = :day AND status != 'CANCELLED'
+                """),
+                {"day": day}
+            )
+            day_row = day_result.fetchone()
+            week_sales_trend.append(SalesTrend(
+                date=week_days[i],
+                amount=float(day_row[1]) if day_row else 0,
+                order_count=day_row[0] if day_row else 0
+            ))
+        except Exception:
+            week_sales_trend.append(SalesTrend(
+                date=week_days[i],
+                amount=0,
+                order_count=0
+            ))
     
     stats = DashboardStats(
         item_count=item_count,
