@@ -3,7 +3,20 @@ version: '3.8'
 services:
   # ==================== 基础设施 ====================
   
-  # Nginx 网关
+  # 前端 Web 服务
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - nginx
+    networks:
+      - erp-network
+    restart: unless-stopped
+
+  # Nginx API 网关
   nginx:
     image: nginx:1.25-alpine
     ports:

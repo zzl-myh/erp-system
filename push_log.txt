@@ -224,3 +224,10 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M push_log.txt
  M scripts/init.sql
 提交信息: 添加 API 文档路由白名单，无需认证访问 Swagger 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 5986e4a] 添加 API 文档路由白名单，无需认证访问 Swagger
+ 3 files changed, 60 insertions(+), 1 deletion(-)
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   1350508..5986e4a  master -> master
+推送成功 
