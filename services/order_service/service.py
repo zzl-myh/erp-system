@@ -7,6 +7,7 @@ from typing import List, Optional, Tuple
 import httpx
 from sqlalchemy import select, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from erp_common.config import settings
 from erp_common.exceptions import BusinessException
@@ -135,7 +136,7 @@ class OrderService:
         result = await self.db.execute(
             select(SoOrder)
             .where(SoOrder.id == order_id)
-            .options(select.SoOrder.details, select.SoOrder.payments, select.SoOrder.shipments)
+            .options(selectinload(SoOrder.details), selectinload(SoOrder.payments), selectinload(SoOrder.shipments))
         )
         return result.scalar_one_or_none()
     
@@ -144,7 +145,7 @@ class OrderService:
         result = await self.db.execute(
             select(SoOrder)
             .where(SoOrder.order_no == order_no)
-            .options(select.SoOrder.details, select.SoOrder.payments, select.SoOrder.shipments)
+            .options(selectinload(SoOrder.details), selectinload(SoOrder.payments), selectinload(SoOrder.shipments))
         )
         return result.scalar_one_or_none()
     

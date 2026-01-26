@@ -7,6 +7,7 @@ import json
 
 from sqlalchemy import select, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from erp_common.config import settings
 from erp_common.exceptions import BusinessException
@@ -96,7 +97,7 @@ class PromoService:
         result = await self.db.execute(
             select(Promo)
             .where(Promo.id == promo_id)
-            .options(select.Promo.rules)
+            .options(selectinload(Promo.rules))
         )
         return result.scalar_one_or_none()
     
@@ -105,7 +106,7 @@ class PromoService:
         result = await self.db.execute(
             select(Promo)
             .where(and_(Promo.code == code, Promo.status == PromoStatus.ACTIVE.value))
-            .options(select.Promo.rules)
+            .options(selectinload(Promo.rules))
         )
         return result.scalar_one_or_none()
     
@@ -253,7 +254,7 @@ class PromoCalculationService:
                     Promo.valid_to >= date.today()
                 )
             )
-            .options(select.Promo.rules)
+            .options(selectinload(Promo.rules))
         )
         return list(result.scalars().all())
     

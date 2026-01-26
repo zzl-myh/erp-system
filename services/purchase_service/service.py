@@ -7,6 +7,7 @@ from typing import List, Optional, Tuple
 import httpx
 from sqlalchemy import select, update, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from erp_common.config import settings
 from erp_common.exceptions import BusinessException
@@ -161,14 +162,18 @@ class PurchaseOrderService:
     async def get_by_id(self, po_id: int) -> Optional[PoOrder]:
         """根据ID获取采购订单"""
         result = await self.db.execute(
-            select(PoOrder).where(PoOrder.id == po_id)
+            select(PoOrder)
+            .where(PoOrder.id == po_id)
+            .options(selectinload(PoOrder.details), selectinload(PoOrder.receives))
         )
         return result.scalar_one_or_none()
     
     async def get_by_po_no(self, po_no: str) -> Optional[PoOrder]:
         """根据单号获取采购订单"""
         result = await self.db.execute(
-            select(PoOrder).where(PoOrder.po_no == po_no)
+            select(PoOrder)
+            .where(PoOrder.po_no == po_no)
+            .options(selectinload(PoOrder.details), selectinload(PoOrder.receives))
         )
         return result.scalar_one_or_none()
     

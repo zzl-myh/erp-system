@@ -7,6 +7,7 @@ from typing import List, Optional, Tuple
 import httpx
 from sqlalchemy import select, update, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from erp_common.config import settings
 from erp_common.exceptions import BusinessException
@@ -82,7 +83,7 @@ class BomService:
         result = await self.db.execute(
             select(BomTemplate)
             .where(BomTemplate.id == bom_id)
-            .options(select.BomTemplate.items)
+            .options(selectinload(BomTemplate.items))
         )
         return result.scalar_one_or_none()
     
@@ -91,7 +92,7 @@ class BomService:
         result = await self.db.execute(
             select(BomTemplate)
             .where(and_(BomTemplate.code == code, BomTemplate.status == BomStatus.ACTIVE.value))
-            .options(select.BomTemplate.items)
+            .options(selectinload(BomTemplate.items))
         )
         return result.scalar_one_or_none()
     
@@ -195,7 +196,7 @@ class ProductionOrderService:
         result = await self.db.execute(
             select(MoOrder)
             .where(MoOrder.id == mo_id)
-            .options(select.MoOrder.details, select.MoOrder.routings)
+            .options(selectinload(MoOrder.details), selectinload(MoOrder.routings))
         )
         return result.scalar_one_or_none()
     
@@ -204,7 +205,7 @@ class ProductionOrderService:
         result = await self.db.execute(
             select(MoOrder)
             .where(MoOrder.mo_no == mo_no)
-            .options(select.MoOrder.details, select.MoOrder.routings)
+            .options(selectinload(MoOrder.details), selectinload(MoOrder.routings))
         )
         return result.scalar_one_or_none()
     
