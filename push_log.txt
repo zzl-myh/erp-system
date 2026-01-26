@@ -91,3 +91,12 @@ warning: in the working copy of 'scripts/health_check.sh', LF will be replaced b
 执行: git push origin master 
 fatal: unable to access 'https://github.com/zzl-myh/erp-system.git/': Could not resolve host: github.com
 [错误] git push 失败 
+========== 周一 2026/01/26  9:18:01.21 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 55 字节 
+ M nginx/nginx.conf
+ M push_log.txt
+提交信息: 修复 Nginx 上游服务端口配置 
