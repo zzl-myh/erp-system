@@ -1,8 +1,10 @@
 """订单中心 - REST API 路由"""
 from typing import Optional
+from datetime import datetime, date, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
 
 from erp_common.database import get_db
 from erp_common.schemas.base import Result, PageResult
@@ -15,10 +17,78 @@ from .schemas import (
     PaymentCreate, PaymentResponse,
     ShipmentCreate, ShipmentResponse,
     ConfirmOrderRequest, CancelOrderRequest, PayOrderRequest, ShipOrderRequest,
-    SoOrderQuery, SoOrderBrief
+    SoOrderQuery, SoOrderBrief,
+    DashboardStats, SalesTrend
 )
+from .models import SoOrder
 
 router = APIRouter(prefix="/order", tags=["订单管理"])
+
+
+# ============ 仪表盘统计 ============
+
+@router.get("/dashboard/stats", response_model=Result[DashboardStats], summary="仪表盘统计")
+async def get_dashboard_stats(
+    db: AsyncSession = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user)
+):
+    """获取仪表盘统计数据"""
+    from sqlalchemy import text
+    
+    today = date.today()
+    week_start = today - timedelta(days=today.weekday())  # 本周一
+    
+    # 商品总数 (查询 item 表)
+    item_result = await db.execute(text("SELECT COUNT(*) FROM item WHERE deleted = 0"))
+    item_count = item_result.scalar() or 0
+    
+    # 会员总数 (查询 member 表)
+    member_result = await db.execute(text("SELECT COUNT(*) FROM member WHERE status = 1"))
+    member_count = member_result.scalar() or 0
+    
+    # 今日订单数和销售额
+    today_result = await db.execute(
+        text("""
+            SELECT COUNT(*) as cnt, COALESCE(SUM(total_amount), 0) as total 
+            FROM so_order 
+            WHERE DATE(order_date) = :today AND status != 'CANCELLED'
+        """),
+        {"today": today}
+    )
+    today_row = today_result.fetchone()
+    today_order_count = today_row[0] if today_row else 0
+    today_sales = float(today_row[1]) if today_row else 0
+    
+    # 本周销售趋势 (近 7 天)
+    week_days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    week_sales_trend = []
+    
+    for i in range(7):
+        day = week_start + timedelta(days=i)
+        day_result = await db.execute(
+            text("""
+                SELECT COUNT(*) as cnt, COALESCE(SUM(total_amount), 0) as total
+                FROM so_order
+                WHERE DATE(order_date) = :day AND status != 'CANCELLED'
+            """),
+            {"day": day}
+        )
+        day_row = day_result.fetchone()
+        week_sales_trend.append(SalesTrend(
+            date=week_days[i],
+            amount=float(day_row[1]) if day_row else 0,
+            order_count=day_row[0] if day_row else 0
+        ))
+    
+    stats = DashboardStats(
+        item_count=item_count,
+        today_order_count=today_order_count,
+        member_count=member_count,
+        today_sales=today_sales,
+        week_sales_trend=week_sales_trend
+    )
+    
+    return Result.ok(data=stats)
 
 
 def get_order_service(

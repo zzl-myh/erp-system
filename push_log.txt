@@ -241,3 +241,11 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M web/package.json
 ?? web/.gitignore
 提交信息: 修复 vue-tsc 构建错误，跳过类型检查 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 67b9bf9] 修复 vue-tsc 构建错误，跳过类型检查
+ 3 files changed, 17 insertions(+), 2 deletions(-)
+ create mode 100644 web/.gitignore
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   ee8367d..67b9bf9  master -> master
+推送成功 

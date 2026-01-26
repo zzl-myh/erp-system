@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard" v-loading="loading">
     <!-- 统计卡片 -->
     <el-row :gutter="20" class="mb-16">
       <el-col :span="6">
@@ -8,7 +8,7 @@
             <el-icon><Goods /></el-icon>
           </div>
           <div class="stat-info">
-            <div class="stat-value">1,234</div>
+            <div class="stat-value">{{ formatNumber(stats.item_count) }}</div>
             <div class="stat-label">商品总数</div>
           </div>
         </el-card>
@@ -19,7 +19,7 @@
             <el-icon><Document /></el-icon>
           </div>
           <div class="stat-info">
-            <div class="stat-value">856</div>
+            <div class="stat-value">{{ formatNumber(stats.today_order_count) }}</div>
             <div class="stat-label">今日订单</div>
           </div>
         </el-card>
@@ -30,7 +30,7 @@
             <el-icon><UserFilled /></el-icon>
           </div>
           <div class="stat-info">
-            <div class="stat-value">5,678</div>
+            <div class="stat-value">{{ formatNumber(stats.member_count) }}</div>
             <div class="stat-label">会员总数</div>
           </div>
         </el-card>
@@ -41,7 +41,7 @@
             <el-icon><TrendCharts /></el-icon>
           </div>
           <div class="stat-info">
-            <div class="stat-value">¥128,456</div>
+            <div class="stat-value">￥{{ formatMoney(stats.today_sales) }}</div>
             <div class="stat-label">今日销售额</div>
           </div>
         </el-card>
@@ -84,39 +84,84 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import * as echarts from 'echarts'
+import { getDashboardStats, type DashboardStats } from '@/api/dashboard'
 
 const chartRef = ref<HTMLElement>()
+const loading = ref(false)
+const stats = reactive<DashboardStats>({
+  item_count: 0,
+  today_order_count: 0,
+  member_count: 0,
+  today_sales: 0,
+  week_sales_trend: []
+})
+
+const dayLabels: Record<string, string> = {
+  'Mon': '周一', 'Tue': '周二', 'Wed': '周三', 
+  'Thu': '周四', 'Fri': '周五', 'Sat': '周六', 'Sun': '周日'
+}
+
+function formatNumber(num: number): string {
+  return num.toLocaleString()
+}
+
+function formatMoney(num: number): string {
+  return num.toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+}
+
+let chart: echarts.ECharts | null = null
+
+function updateChart() {
+  if (!chart) return
+  
+  const xData = stats.week_sales_trend.map(t => dayLabels[t.date] || t.date)
+  const yData = stats.week_sales_trend.map(t => t.amount)
+  
+  chart.setOption({
+    tooltip: { trigger: 'axis' },
+    xAxis: {
+      type: 'category',
+      data: xData,
+    },
+    yAxis: { type: 'value' },
+    series: [
+      {
+        name: '销售额',
+        type: 'line',
+        smooth: true,
+        data: yData,
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(64, 158, 255, 0.5)' },
+            { offset: 1, color: 'rgba(64, 158, 255, 0.1)' },
+          ]),
+        },
+      },
+    ],
+  })
+}
+
+async function fetchStats() {
+  loading.value = true
+  try {
+    const res = await getDashboardStats()
+    if (res.success && res.data) {
+      Object.assign(stats, res.data)
+      updateChart()
+    }
+  } finally {
+    loading.value = false
+  }
+}
 
 onMounted(() => {
   if (chartRef.value) {
-    const chart = echarts.init(chartRef.value)
-    chart.setOption({
-      tooltip: { trigger: 'axis' },
-      xAxis: {
-        type: 'category',
-        data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-      },
-      yAxis: { type: 'value' },
-      series: [
-        {
-          name: '销售额',
-          type: 'line',
-          smooth: true,
-          data: [12000, 15000, 18000, 14000, 22000, 28000, 25000],
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(64, 158, 255, 0.5)' },
-              { offset: 1, color: 'rgba(64, 158, 255, 0.1)' },
-            ]),
-          },
-        },
-      ],
-    })
-
-    window.addEventListener('resize', () => chart.resize())
+    chart = echarts.init(chartRef.value)
+    window.addEventListener('resize', () => chart?.resize())
   }
+  fetchStats()
 })
 </script>
 

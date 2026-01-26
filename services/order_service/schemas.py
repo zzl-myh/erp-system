@@ -295,3 +295,21 @@ class OrderShippedEvent(BaseModel):
     shipping_company: Optional[str] = None
     tracking_number: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+
+# ============ 仪表盘统计 Schema ============
+
+class SalesTrend(BaseModel):
+    """销售趋势"""
+    date: str = Field(..., description="日期")
+    amount: float = Field(default=0, description="销售额")
+    order_count: int = Field(default=0, description="订单数")
+
+
+class DashboardStats(BaseModel):
+    """仪表盘统计数据"""
+    item_count: int = Field(default=0, description="商品总数")
+    today_order_count: int = Field(default=0, description="今日订单数")
+    member_count: int = Field(default=0, description="会员总数")
+    today_sales: float = Field(default=0, description="今日销售额")
+    week_sales_trend: List[SalesTrend] = Field(default=[], description="本周销售趋势")
