@@ -28,6 +28,20 @@ from .service import AuthService, RoleService, UserService
 router = APIRouter(prefix="/user", tags=["用户中心"])
 
 
+# ==================== 健康检查（必须放在最前面） ====================
+
+@router.get("/health", summary="健康检查")
+async def health_check():
+    """服务健康检查"""
+    return {"status": "healthy", "service": "user-service"}
+
+
+@router.get("/ready", summary="就绪检查")
+async def readiness_check():
+    """服务就绪检查"""
+    return {"status": "ready", "service": "user-service"}
+
+
 def get_auth_service(
     db: AsyncSession = Depends(get_db),
 ) -> AuthService:
@@ -226,11 +240,3 @@ async def list_roles(
     """获取所有角色列表"""
     roles = await service.list_roles()
     return Result.ok(data=[RoleResponse.model_validate(r) for r in roles])
-
-
-# ==================== 健康检查 ====================
-
-@router.get("/health", summary="健康检查")
-async def health_check():
-    """服务健康检查"""
-    return {"status": "healthy", "service": "user-service"}

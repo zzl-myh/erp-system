@@ -59,11 +59,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-# 注册路由
-app.include_router(router)
-
-
-# 健康检查端点
+# 健康检查端点（必须在 include_router 之前注册）
 @app.get("/cost/health", tags=["健康检查"])
 async def health_check():
     """健康检查"""
@@ -73,8 +69,11 @@ async def health_check():
 @app.get("/cost/ready", tags=["健康检查"])
 async def readiness_check():
     """就绪检查"""
-    # TODO: 检查数据库、Redis、Kafka 连接
     return {"status": "ready", "service": "cost_service"}
+
+
+# 注册路由
+app.include_router(router)
 
 
 if __name__ == "__main__":

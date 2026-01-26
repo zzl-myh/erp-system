@@ -26,6 +26,21 @@ from .service import CategoryService, ItemService
 
 router = APIRouter(prefix="/item", tags=["商品中心"])
 
+
+# ==================== 健康检查（必须放在最前面） ====================
+
+@router.get("/health", summary="健康检查")
+async def health_check():
+    """服务健康检查"""
+    return {"status": "healthy", "service": "item-service"}
+
+
+@router.get("/ready", summary="就绪检查")
+async def readiness_check():
+    """服务就绪检查"""
+    return {"status": "ready", "service": "item-service"}
+
+
 # 全局 Kafka 生产者（在 lifespan 中初始化）
 kafka_producer: KafkaProducer = None
 
@@ -176,11 +191,3 @@ async def list_categories(
     """获取分类列表"""
     categories = await service.list_categories(parent_id)
     return Result.ok(data=[CategoryResponse.model_validate(c) for c in categories])
-
-
-# ==================== 健康检查 ====================
-
-@router.get("/health", summary="健康检查")
-async def health_check():
-    """服务健康检查"""
-    return {"status": "healthy", "service": "item-service"}
