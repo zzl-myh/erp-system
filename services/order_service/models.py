@@ -1,5 +1,5 @@
 """订单中心 - SQLAlchemy 模型"""
-from datetime import datetime
+from datetime import datetime, date
 from decimal import Decimal
 from typing import Optional, List
 
@@ -42,7 +42,7 @@ class SoOrder(Base):
     status: Mapped[str] = mapped_column(String(20), default="DRAFT", comment="状态: DRAFT/CONFIRMED/PAYMENT_PENDING/PAYMENT_PARTIAL/PAYMENT_COMPLETED/SHIPPED/DELIVERED/CANCELLED/RETURNED")
     
     # 日期
-    order_date: Mapped[datetime] = mapped_column(Date, default=datetime.utcnow.date, comment="订单日期")
+    order_date: Mapped[datetime] = mapped_column(Date, default=date.today, comment="订单日期")
     delivery_date: Mapped[Optional[datetime]] = mapped_column(Date, comment="配送日期")
     
     # 支付信息
@@ -139,7 +139,7 @@ class Payment(Base):
     # 支付信息
     payment_method: Mapped[str] = mapped_column(String(20), nullable=False, comment="支付方式")
     payment_amount: Mapped[Decimal] = mapped_column(DECIMAL(18, 2), nullable=False, comment="支付金额")
-    payment_date: Mapped[datetime] = mapped_column(Date, default=datetime.utcnow.date, comment="支付日期")
+    payment_date: Mapped[datetime] = mapped_column(Date, default=date.today, comment="支付日期")
     payment_time: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, comment="支付时间")
     
     # 状态

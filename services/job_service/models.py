@@ -1,5 +1,5 @@
 """报工中心 - SQLAlchemy 模型"""
-from datetime import datetime
+from datetime import datetime, date
 from decimal import Decimal
 from typing import Optional, List
 
@@ -51,7 +51,7 @@ class ReportJob(Base):
     status: Mapped[str] = mapped_column(String(20), default="REPORTED", comment="状态: REPORTED/CONFIRMED/REJECTED")
     
     # 时间
-    report_date: Mapped[datetime] = mapped_column(Date, default=datetime.utcnow.date, comment="报工日期")
+    report_date: Mapped[datetime] = mapped_column(Date, default=date.today, comment="报工日期")
     report_time: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, comment="报工时间")
     
     # 备注
@@ -98,7 +98,7 @@ class ReportLoss(Base):
     loss_reason: Mapped[Optional[str]] = mapped_column(String(200), comment="损耗原因")
     
     # 时间
-    loss_date: Mapped[datetime] = mapped_column(Date, default=datetime.utcnow.date, comment="报损日期")
+    loss_date: Mapped[datetime] = mapped_column(Date, default=date.today, comment="报损日期")
     loss_time: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, comment="报损时间")
     
     # 操作人
@@ -132,7 +132,7 @@ class MoWorkHour(Base):
     worker_name: Mapped[Optional[str]] = mapped_column(String(50), comment="工人姓名")
     
     # 工时信息
-    work_date: Mapped[datetime] = mapped_column(Date, default=datetime.utcnow.date, comment="工作日期")
+    work_date: Mapped[datetime] = mapped_column(Date, default=date.today, comment="工作日期")
     work_hours: Mapped[Decimal] = mapped_column(DECIMAL(10, 2), nullable=False, comment="工时")
     
     # 工作内容
