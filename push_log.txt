@@ -277,3 +277,20 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M services/promo_service/service.py
  M services/purchase_service/service.py
 提交信息: 修复所有服务的SQLAlchemy异步关系预加载问题 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master a3edeec] 修复所有服务的SQLAlchemy异步关系预加载问题
+ 5 files changed, 31 insertions(+), 11 deletions(-)
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   d868680..a3edeec  master -> master
+推送成功 
+========== 周四 2026/01/29 16:58:13.10 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 91 字节 
+ M docker-compose.yml
+ M push_log.txt
+ M "\346\236\266\346\236\204.txt"
+提交信息: Kafka 健康检查 

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # ==================== 基础设施 ====================
   
@@ -97,6 +95,12 @@ services:
     networks:
       - erp-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   # ==================== 微服务 ====================
 
@@ -115,7 +119,7 @@ services:
       redis:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     networks:
       - erp-network
     restart: unless-stopped
@@ -154,7 +158,7 @@ services:
       redis:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     networks:
       - erp-network
     restart: unless-stopped
@@ -172,7 +176,7 @@ services:
       mysql:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     networks:
       - erp-network
     restart: unless-stopped
@@ -190,7 +194,7 @@ services:
       mysql:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     networks:
       - erp-network
     restart: unless-stopped
@@ -208,7 +212,7 @@ services:
       mysql:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     networks:
       - erp-network
     restart: unless-stopped
@@ -226,7 +230,7 @@ services:
       mysql:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     networks:
       - erp-network
     restart: unless-stopped
@@ -246,7 +250,7 @@ services:
       redis:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     networks:
       - erp-network
     restart: unless-stopped
@@ -264,7 +268,7 @@ services:
       mysql:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
     networks:
       - erp-network
     restart: unless-stopped
