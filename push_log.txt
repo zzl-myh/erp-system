@@ -611,3 +611,10 @@ MM push_log.txt
  M web/src/stores/user.ts
 ?? web/src/views/user/profile.vue
 提交信息: 用户个人信息新增/权限动态隐藏 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 1ec35ab] 用户个人信息新增/权限动态隐藏
+ 6 files changed, 385 insertions(+), 24 deletions(-)
+ create mode 100644 web/src/views/user/profile.vue
+执行: git push origin master 
+fatal: unable to access 'https://github.com/zzl-myh/erp-system.git/': Recv failure: Connection was reset
+[错误] git push 失败 
