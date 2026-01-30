@@ -37,6 +37,18 @@ request.interceptors.request.use(
     if (userStore.token) {
       config.headers.Authorization = `Bearer ${userStore.token}`
     }
+    
+    // 过滤空值参数（undefined, null, 空字符串）
+    if (config.params) {
+      const cleanParams: Record<string, any> = {}
+      for (const [key, value] of Object.entries(config.params)) {
+        if (value !== undefined && value !== null && value !== '') {
+          cleanParams[key] = value
+        }
+      }
+      config.params = cleanParams
+    }
+    
     return config
   },
   (error) => {
