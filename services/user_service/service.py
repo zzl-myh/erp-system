@@ -287,8 +287,9 @@ class UserService:
         result = await self.db.execute(stmt)
         users = result.scalars().all()
         
+        # 返回原始用户对象，由 api 层处理角色信息转换
         return PageResult(
-            items=[UserResponse.model_validate(u) for u in users],
+            items=users,
             total=total,
             page=query.page,
             size=query.size,

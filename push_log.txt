@@ -360,3 +360,21 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M web/src/api/request.ts
 ?? DEVELOPMENT_NOTES.md
 提交信息: 优化用户管理网关xinxi 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 209fffa] 优化用户管理网关xinxi
+ 3 files changed, 301 insertions(+)
+ create mode 100644 DEVELOPMENT_NOTES.md
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   a37e442..209fffa  master -> master
+推送成功 
+========== 周五 2026/01/30 10:30:48.41 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 141 字节 
+ M push_log.txt
+ M services/user_service/service.py
+ M "\346\250\241\345\235\227\344\274\230\345\214\226\347\202\271.txt"
+提交信息: 修复Pydantic 验证失败 
