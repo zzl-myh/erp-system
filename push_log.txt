@@ -399,3 +399,20 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M services/user_service/service.py
 ?? scripts/init_permissions.sql
 提交信息: 权限点优化 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master cd330ad] 权限点优化
+ 7 files changed, 483 insertions(+), 4 deletions(-)
+ create mode 100644 scripts/init_permissions.sql
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   bf81c25..cd330ad  master -> master
+推送成功 
+========== 周五 2026/01/30 10:50:20.77 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 67 字节 
+ M push_log.txt
+ M scripts/init_permissions.sql
+提交信息: 1 

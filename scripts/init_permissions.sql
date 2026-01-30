@@ -1,5 +1,8 @@
 -- 权限点初始化数据
--- 执行方式: docker exec -i erp-mysql-1 mysql -uroot -p erp < scripts/init_permissions.sql
+-- 执行方式: docker exec -i erp-mysql-1 mysql -uroot -pX7kL9mP2qR5tlyzm erp < scripts/init_permissions.sql
+
+-- 禁用外键检查
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- 清空现有数据
 TRUNCATE TABLE role_permission;
@@ -110,5 +113,8 @@ INSERT INTO role_permission (role_id, permission_id) VALUES
 -- FINANCE（财务人员）
 INSERT INTO role_permission (role_id, permission_id) VALUES
 (8, 50), (8, 70), (8, 100), (8, 101), (8, 120), (8, 121), (8, 122);
+
+-- 启用外键检查
+SET FOREIGN_KEY_CHECKS = 1;
 
 SELECT CONCAT('初始化完成，共 ', COUNT(*), ' 个权限点') AS result FROM permission;
