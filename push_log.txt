@@ -618,3 +618,12 @@ warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the 
 执行: git push origin master 
 fatal: unable to access 'https://github.com/zzl-myh/erp-system.git/': Recv failure: Connection was reset
 [错误] git push 失败 
+========== 周五 2026/01/30 14:01:20.17 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 62 字节 
+ M push_log.txt
+ M web/src/router/index.ts
+提交信息: 权限菜单未显示问题 

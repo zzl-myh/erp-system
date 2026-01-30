@@ -119,6 +119,18 @@ router.beforeEach(async (to, from, next) => {
   } else if (!token) {
     next({ path: '/login', query: { redirect: to.fullPath } })
   } else {
+    // 如果已登录但没有用户信息，需要获取用户信息和权限
+    if (!userStore.userInfo) {
+      try {
+        await userStore.fetchUserInfo()
+        await userStore.fetchPermissions()
+      } catch (error) {
+        // 获取失败（token可能已过期），跳转登录
+        userStore.logout()
+        next({ path: '/login', query: { redirect: to.fullPath } })
+        return
+      }
+    }
     next()
   }
 })
