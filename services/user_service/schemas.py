@@ -61,10 +61,18 @@ class PasswordChange(BaseModel):
     new_password: str = Field(..., min_length=6, max_length=100)
 
 
+class PasswordReset(BaseModel):
+    """重置密码请求（管理员操作）"""
+    user_id: int = Field(..., description="用户ID")
+    new_password: str = Field(..., min_length=6, max_length=100, description="新密码")
+
+
 class UserRoleResponse(BaseModel):
     """用户角色响应"""
     id: int
-    role_code: str
+    code: str
+    name: str
+    description: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -120,6 +128,17 @@ class RoleCreate(BaseModel):
     description: Optional[str] = Field(None, max_length=500)
 
 
+class RoleUpdate(BaseModel):
+    """更新角色请求"""
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
+
+
+class RoleQuery(PageQuery):
+    """角色查询条件"""
+    keyword: Optional[str] = Field(None, description="关键词搜索")
+
+
 class RoleResponse(BaseModel):
     """角色响应"""
     id: int
@@ -141,6 +160,22 @@ class OrgCreate(BaseModel):
     parent_id: int = 0
 
 
+class OrgUpdate(BaseModel):
+    """更新组织请求"""
+    name: Optional[str] = Field(None, min_length=1, max_length=200)
+    type: Optional[str] = Field(None, description="类型")
+    parent_id: Optional[int] = None
+    status: Optional[int] = Field(None, ge=0, le=1)
+
+
+class OrgQuery(PageQuery):
+    """组织查询条件"""
+    keyword: Optional[str] = Field(None, description="关键词搜索")
+    type: Optional[str] = Field(None, description="组织类型")
+    parent_id: Optional[int] = Field(None, description="父级ID")
+    status: Optional[int] = Field(None, ge=0, le=1)
+
+
 class OrgResponse(BaseModel):
     """组织响应"""
     id: int
@@ -149,9 +184,37 @@ class OrgResponse(BaseModel):
     type: str
     parent_id: int
     status: int
+    created_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
+
+
+# ========== 操作日志相关 ==========
+
+class AuditLogResponse(BaseModel):
+    """操作日志响应"""
+    id: int
+    user_id: int
+    username: str
+    action: str
+    resource_type: str
+    resource_id: Optional[str] = None
+    detail: Optional[str] = None
+    ip_address: Optional[str] = None
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+
+class AuditLogQuery(PageQuery):
+    """操作日志查询条件"""
+    user_id: Optional[int] = Field(None, description="用户ID")
+    action: Optional[str] = Field(None, description="操作类型")
+    resource_type: Optional[str] = Field(None, description="资源类型")
+    start_time: Optional[datetime] = Field(None, description="开始时间")
+    end_time: Optional[datetime] = Field(None, description="结束时间")
 
 
 # 解决循环引用

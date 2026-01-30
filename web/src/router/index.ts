@@ -28,6 +28,20 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/user/index.vue'),
         meta: { title: '用户管理', icon: 'User' }
       },
+      // 角色管理
+      {
+        path: 'role',
+        name: 'RoleManage',
+        component: () => import('@/views/user/role.vue'),
+        meta: { title: '角色管理', icon: 'Avatar' }
+      },
+      // 组织管理
+      {
+        path: 'org',
+        name: 'OrgManage',
+        component: () => import('@/views/user/org.vue'),
+        meta: { title: '组织管理', icon: 'OfficeBuilding' }
+      },
       // 商品管理
       {
         path: 'item',

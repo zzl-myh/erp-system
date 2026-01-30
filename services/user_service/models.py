@@ -99,3 +99,19 @@ class RolePermission(Base):
     
     role_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("role.id"), primary_key=True)
     permission_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("permission.id"), primary_key=True)
+
+
+class AuditLog(Base):
+    """操作日志表"""
+    
+    __tablename__ = "audit_log"
+    
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, nullable=False, comment="操作用户ID")
+    username: Mapped[str] = mapped_column(String(50), nullable=False, comment="操作用户名")
+    action: Mapped[str] = mapped_column(String(50), nullable=False, comment="操作类型: CREATE/UPDATE/DELETE/LOGIN/LOGOUT")
+    resource_type: Mapped[str] = mapped_column(String(50), nullable=False, comment="资源类型: USER/ROLE/ORG")
+    resource_id: Mapped[Optional[str]] = mapped_column(String(50), comment="资源ID")
+    detail: Mapped[Optional[str]] = mapped_column(Text, comment="操作详情")
+    ip_address: Mapped[Optional[str]] = mapped_column(String(50), comment="IP地址")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)

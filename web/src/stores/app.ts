@@ -15,6 +15,8 @@ export const useAppStore = defineStore('app', () => {
   const menuList = ref<MenuItem[]>([
     { path: '/dashboard', title: '仪表盘', icon: 'Odometer' },
     { path: '/user', title: '用户管理', icon: 'User' },
+    { path: '/role', title: '角色管理', icon: 'Avatar' },
+    { path: '/org', title: '组织管理', icon: 'OfficeBuilding' },
     { path: '/item', title: '商品管理', icon: 'Goods' },
     { path: '/stock', title: '库存管理', icon: 'Box' },
     { path: '/order', title: '订单管理', icon: 'Document' },

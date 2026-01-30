@@ -12,6 +12,15 @@ export interface ApiResult<T = any> {
   timestamp: string
 }
 
+// 分页结果结构
+export interface PageResult<T = any> {
+  items: T[]
+  total: number
+  page: number
+  size: number
+  pages: number
+}
+
 // 创建 axios 实例
 const request = axios.create({
   baseURL: '/api',

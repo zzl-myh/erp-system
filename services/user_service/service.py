@@ -343,6 +343,33 @@ class UserService:
         
         logger.info(f"Password changed for user: {user.username}")
         return True
+    
+    async def reset_password(self, user_id: int, new_password: str) -> bool:
+        """重置密码（管理员操作）"""
+        user = await self.get_user(user_id)
+        
+        # 直接更新密码
+        user.password = get_password_hash(new_password)
+        await self.db.flush()
+        
+        logger.info(f"Password reset for user: {user.username}")
+        return True
+    
+    async def delete_user(self, user_id: int) -> bool:
+        """删除用户"""
+        user = await self.get_user(user_id)
+        
+        # 删除用户角色关联
+        await self.db.execute(
+            delete(UserRole).where(UserRole.user_id == user_id)
+        )
+        
+        # 删除用户
+        await self.db.delete(user)
+        await self.db.flush()
+        
+        logger.info(f"User deleted: {user.username}")
+        return True
 
 
 class RoleService:
@@ -353,7 +380,7 @@ class RoleService:
     
     async def list_roles(self) -> List[Role]:
         """获取所有角色"""
-        result = await self.db.execute(select(Role))
+        result = await self.db.execute(select(Role).order_by(Role.id))
         return list(result.scalars().all())
     
     async def get_role(self, role_code: str) -> Role:
@@ -367,3 +394,231 @@ class RoleService:
             raise NotFoundError("Role", role_code)
         
         return role
+    
+    async def get_role_by_id(self, role_id: int) -> Role:
+        """根据ID获取角色"""
+        result = await self.db.execute(
+            select(Role).where(Role.id == role_id)
+        )
+        role = result.scalar_one_or_none()
+        
+        if not role:
+            raise NotFoundError("Role", role_id)
+        
+        return role
+    
+    async def create_role(self, code: str, name: str, description: str = None) -> Role:
+        """创建角色"""
+        # 检查编码是否存在
+        existing = await self.db.execute(
+            select(Role).where(Role.code == code)
+        )
+        if existing.scalar_one_or_none():
+            raise ConflictError(f"Role code '{code}' already exists")
+        
+        role = Role(code=code, name=name, description=description)
+        self.db.add(role)
+        await self.db.flush()
+        
+        logger.info(f"Role created: {code}")
+        return role
+    
+    async def update_role(self, role_id: int, name: str = None, description: str = None) -> Role:
+        """更新角色"""
+        role = await self.get_role_by_id(role_id)
+        
+        if name is not None:
+            role.name = name
+        if description is not None:
+            role.description = description
+        
+        await self.db.flush()
+        logger.info(f"Role updated: {role.code}")
+        return role
+    
+    async def delete_role(self, role_id: int) -> bool:
+        """删除角色"""
+        role = await self.get_role_by_id(role_id)
+        
+        # 检查是否有用户使用该角色
+        user_count_result = await self.db.execute(
+            select(func.count(UserRole.id)).where(UserRole.role_code == role.code)
+        )
+        user_count = user_count_result.scalar()
+        
+        if user_count > 0:
+            raise ValidationError(f"角色 '{role.name}' 正在被 {user_count} 个用户使用，无法删除")
+        
+        await self.db.delete(role)
+        await self.db.flush()
+        
+        logger.info(f"Role deleted: {role.code}")
+        return True
+
+
+class OrgService:
+    """组织服务"""
+    
+    def __init__(self, db: AsyncSession):
+        self.db = db
+    
+    async def list_orgs(self, type: str = None, parent_id: int = None, status: int = None) -> List[Org]:
+        """获取组织列表"""
+        conditions = []
+        if type:
+            conditions.append(Org.type == type)
+        if parent_id is not None:
+            conditions.append(Org.parent_id == parent_id)
+        if status is not None:
+            conditions.append(Org.status == status)
+        
+        stmt = select(Org).order_by(Org.id)
+        if conditions:
+            stmt = stmt.where(*conditions)
+        
+        result = await self.db.execute(stmt)
+        return list(result.scalars().all())
+    
+    async def get_org(self, org_id: int) -> Org:
+        """获取组织"""
+        result = await self.db.execute(
+            select(Org).where(Org.id == org_id)
+        )
+        org = result.scalar_one_or_none()
+        
+        if not org:
+            raise NotFoundError("Org", org_id)
+        
+        return org
+    
+    async def create_org(self, code: str, name: str, type: str, parent_id: int = 0) -> Org:
+        """创建组织"""
+        # 检查编码是否存在
+        existing = await self.db.execute(
+            select(Org).where(Org.code == code)
+        )
+        if existing.scalar_one_or_none():
+            raise ConflictError(f"Org code '{code}' already exists")
+        
+        org = Org(code=code, name=name, type=type, parent_id=parent_id)
+        self.db.add(org)
+        await self.db.flush()
+        
+        logger.info(f"Org created: {code}")
+        return org
+    
+    async def update_org(self, org_id: int, name: str = None, type: str = None, 
+                         parent_id: int = None, status: int = None) -> Org:
+        """更新组织"""
+        org = await self.get_org(org_id)
+        
+        if name is not None:
+            org.name = name
+        if type is not None:
+            org.type = type
+        if parent_id is not None:
+            org.parent_id = parent_id
+        if status is not None:
+            org.status = status
+        
+        await self.db.flush()
+        logger.info(f"Org updated: {org.code}")
+        return org
+    
+    async def delete_org(self, org_id: int) -> bool:
+        """删除组织"""
+        org = await self.get_org(org_id)
+        
+        # 检查是否有子组织
+        children_result = await self.db.execute(
+            select(func.count(Org.id)).where(Org.parent_id == org_id)
+        )
+        children_count = children_result.scalar()
+        
+        if children_count > 0:
+            raise ValidationError(f"组织 '{org.name}' 存在 {children_count} 个子组织，无法删除")
+        
+        # 检查是否有用户
+        user_count_result = await self.db.execute(
+            select(func.count(User.id)).where(User.org_id == org_id)
+        )
+        user_count = user_count_result.scalar()
+        
+        if user_count > 0:
+            raise ValidationError(f"组织 '{org.name}' 存在 {user_count} 个用户，无法删除")
+        
+        await self.db.delete(org)
+        await self.db.flush()
+        
+        logger.info(f"Org deleted: {org.code}")
+        return True
+
+
+class AuditLogService:
+    """操作日志服务"""
+    
+    def __init__(self, db: AsyncSession):
+        self.db = db
+    
+    async def log(self, user_id: int, username: str, action: str, 
+                  resource_type: str, resource_id: str = None, 
+                  detail: str = None, ip_address: str = None):
+        """记录操作日志"""
+        from .models import AuditLog
+        
+        log = AuditLog(
+            user_id=user_id,
+            username=username,
+            action=action,
+            resource_type=resource_type,
+            resource_id=resource_id,
+            detail=detail,
+            ip_address=ip_address
+        )
+        self.db.add(log)
+        await self.db.flush()
+    
+    async def list_logs(self, user_id: int = None, action: str = None,
+                        resource_type: str = None, start_time = None,
+                        end_time = None, page: int = 1, size: int = 20):
+        """查询操作日志"""
+        from .models import AuditLog
+        from erp_common.schemas.base import PageResult
+        from .schemas import AuditLogResponse
+        
+        conditions = []
+        if user_id:
+            conditions.append(AuditLog.user_id == user_id)
+        if action:
+            conditions.append(AuditLog.action == action)
+        if resource_type:
+            conditions.append(AuditLog.resource_type == resource_type)
+        if start_time:
+            conditions.append(AuditLog.created_at >= start_time)
+        if end_time:
+            conditions.append(AuditLog.created_at <= end_time)
+        
+        # 查询总数
+        count_stmt = select(func.count(AuditLog.id))
+        if conditions:
+            count_stmt = count_stmt.where(*conditions)
+        
+        total_result = await self.db.execute(count_stmt)
+        total = total_result.scalar()
+        
+        # 查询数据
+        offset = (page - 1) * size
+        stmt = select(AuditLog).order_by(AuditLog.created_at.desc())
+        if conditions:
+            stmt = stmt.where(*conditions)
+        stmt = stmt.offset(offset).limit(size)
+        
+        result = await self.db.execute(stmt)
+        logs = result.scalars().all()
+        
+        return PageResult(
+            items=[AuditLogResponse.model_validate(log) for log in logs],
+            total=total,
+            page=page,
+            size=size
+        )

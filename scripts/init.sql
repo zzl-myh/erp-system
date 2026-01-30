@@ -130,6 +130,23 @@ CREATE TABLE IF NOT EXISTS role_permission (
     FOREIGN KEY (permission_id) REFERENCES permission(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色权限关联表';
 
+-- 操作日志表
+CREATE TABLE IF NOT EXISTS audit_log (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL COMMENT '操作用户ID',
+    username VARCHAR(50) NOT NULL COMMENT '操作用户名',
+    action VARCHAR(50) NOT NULL COMMENT '操作类型: CREATE/UPDATE/DELETE/LOGIN/LOGOUT',
+    resource_type VARCHAR(50) NOT NULL COMMENT '资源类型: USER/ROLE/ORG',
+    resource_id VARCHAR(50) COMMENT '资源ID',
+    detail TEXT COMMENT '操作详情',
+    ip_address VARCHAR(50) COMMENT 'IP地址',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user (user_id),
+    INDEX idx_action (action),
+    INDEX idx_resource (resource_type),
+    INDEX idx_time (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志表';
+
 -- ==================== 库存中心表 ====================
 
 -- 仓库表
