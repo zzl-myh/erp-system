@@ -592,3 +592,22 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
 文件状态大小: 35 字节 
  M push_log.txt
 提交信息: 用户信息获取修复 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 279a66e] 用户信息获取修复
+ 1 file changed, 14 insertions(+)
+执行: git push origin master 
+fatal: unable to access 'https://github.com/zzl-myh/erp-system.git/': Failed to connect to github.com port 443 after 21123 ms: Could not connect to server
+[错误] git push 失败 
+========== 周五 2026/01/30 13:50:04.99 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 178 字节 
+MM push_log.txt
+ M web/src/layouts/default.vue
+ M web/src/router/index.ts
+ M web/src/stores/app.ts
+ M web/src/stores/user.ts
+?? web/src/views/user/profile.vue
+提交信息: 用户个人信息新增/权限动态隐藏 
