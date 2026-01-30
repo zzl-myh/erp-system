@@ -578,3 +578,17 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M push_log.txt
  M web/src/stores/user.ts
 提交信息: 用户信息获取问题 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 0e27235] 用户信息获取问题
+ 2 files changed, 18 insertions(+)
+执行: git push origin master 
+fatal: unable to access 'https://github.com/zzl-myh/erp-system.git/': Recv failure: Connection was reset
+[错误] git push 失败 
+========== 周五 2026/01/30 13:38:57.94 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 35 字节 
+ M push_log.txt
+提交信息: 用户信息获取修复 
