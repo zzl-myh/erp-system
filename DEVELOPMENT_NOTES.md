@@ -256,7 +256,69 @@ docker-compose logs -f user-service
 
 ---
 
-## 8. 待优化项
+## 8. 权限设计
+
+### 8.1 权限模型
+
+```
+用户 (User) ——N:M—— 角色 (Role) ——N:M—— 权限点 (Permission)
+```
+
+### 8.2 权限点命名规范
+
+格式：`资源:操作`
+
+| 模块 | 权限点示例 |
+|------|----------|
+| 用户 | `user:view`, `user:create`, `user:update`, `user:delete` |
+| 角色 | `role:view`, `role:create`, `role:assign`, `role:permission` |
+| 商品 | `item:view`, `item:create`, `item:update`, `item:delete` |
+| 订单 | `order:view`, `order:create`, `order:cancel` |
+
+### 8.3 后端使用方式
+
+```python
+from erp_common.auth import require_permissions, require_roles
+
+# 按角色控制（粗粒度）
+@router.post("/user/create")
+async def create_user(
+    user: CurrentUser = Depends(require_roles("ADMIN"))
+):
+    pass
+
+# 按权限点控制（细粒度）
+@router.delete("/user/{id}")
+async def delete_user(
+    user: CurrentUser = Depends(require_permissions("user:delete"))
+):
+    pass
+```
+
+### 8.4 权限相关 API
+
+| 接口 | 说明 |
+|------|------|
+| `GET /user/permission/list` | 获取所有权限点 |
+| `GET /user/permission/me` | 获取当前用户权限 |
+| `GET /user/permission/role/{role_id}` | 获取角色权限 |
+| `POST /user/permission/assign` | 为角色分配权限 |
+
+### 8.5 初始化权限数据
+
+```bash
+# 在 Linux 服务器执行
+cd /path/to/erp
+docker exec -i erp-mysql-1 mysql -uroot -p erp < scripts/init_permissions.sql
+```
+
+### 8.6 ADMIN 角色特殊处理
+
+ADMIN 角色自动拥有所有权限，无需单独分配。
+
+---
+
+## 9. 待优化项
 
 - [ ] 添加操作日志记录功能
 - [ ] 完善权限控制粒度

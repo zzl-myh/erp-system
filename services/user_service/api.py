@@ -31,8 +31,10 @@ from .schemas import (
     OrgResponse,
     AuditLogResponse,
     AuditLogQuery,
+    PermissionResponse,
+    RolePermissionAssign,
 )
-from .service import AuthService, RoleService, UserService, OrgService, AuditLogService
+from .service import AuthService, RoleService, UserService, OrgService, AuditLogService, PermissionService
 
 router = APIRouter(prefix="/user", tags=["用户中心"])
 
@@ -84,6 +86,13 @@ def get_audit_log_service(
 ) -> AuditLogService:
     """获取操作日志服务实例"""
     return AuditLogService(db)
+
+
+def get_permission_service(
+    db: AsyncSession = Depends(get_db),
+) -> PermissionService:
+    """获取权限服务实例"""
+    return PermissionService(db)
 
 
 async def enrich_user_roles(user, db: AsyncSession) -> UserResponse:
@@ -447,6 +456,55 @@ async def list_audit_logs(
         size=size
     )
     return Result.ok(data=result)
+
+
+# ==================== 权限接口 ====================
+
+@router.get("/permission/list", response_model=Result[list[PermissionResponse]], summary="权限列表")
+async def list_permissions(
+    service: PermissionService = Depends(get_permission_service),
+    user: CurrentUser = Depends(get_current_user),
+):
+    """获取所有权限点"""
+    permissions = await service.list_permissions()
+    return Result.ok(data=[PermissionResponse.model_validate(p) for p in permissions])
+
+
+@router.get("/permission/role/{role_id}", response_model=Result[list[PermissionResponse]], summary="角色权限")
+async def get_role_permissions(
+    role_id: int,
+    service: PermissionService = Depends(get_permission_service),
+    user: CurrentUser = Depends(get_current_user),
+):
+    """获取角色的权限点"""
+    permissions = await service.get_role_permissions(role_id)
+    return Result.ok(data=[PermissionResponse.model_validate(p) for p in permissions])
+
+
+@router.post("/permission/assign", response_model=Result, summary="分配角色权限")
+async def assign_role_permissions(
+    data: RolePermissionAssign,
+    service: PermissionService = Depends(get_permission_service),
+    user: CurrentUser = Depends(require_roles("ADMIN")),
+):
+    """为角色分配权限（管理员权限）"""
+    await service.assign_role_permissions(data.role_id, data.permission_codes)
+    return Result.ok(message="Permissions assigned successfully")
+
+
+@router.get("/permission/me", response_model=Result[list[str]], summary="我的权限")
+async def get_my_permissions(
+    service: PermissionService = Depends(get_permission_service),
+    user: CurrentUser = Depends(get_current_user),
+):
+    """获取当前用户的权限点"""
+    # ADMIN 拥有所有权限
+    if "ADMIN" in user.roles:
+        permissions = await service.list_permissions()
+        return Result.ok(data=[p.code for p in permissions])
+    
+    permissions = await service.get_user_permissions(user.user_id)
+    return Result.ok(data=list(permissions))
 
 
 # ==================== 用户路径参数接口（必须放在最后） ====================

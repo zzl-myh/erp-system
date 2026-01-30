@@ -378,3 +378,24 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M services/user_service/service.py
  M "\346\250\241\345\235\227\344\274\230\345\214\226\347\202\271.txt"
 提交信息: 修复Pydantic 验证失败 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master bf81c25] 修复Pydantic 验证失败
+ 3 files changed, 21 insertions(+), 2 deletions(-)
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   209fffa..bf81c25  master -> master
+推送成功 
+========== 周五 2026/01/30 10:45:50.61 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 217 字节 
+ M DEVELOPMENT_NOTES.md
+ M erp_common/auth.py
+ M push_log.txt
+ M services/user_service/api.py
+ M services/user_service/schemas.py
+ M services/user_service/service.py
+?? scripts/init_permissions.sql
+提交信息: 权限点优化 

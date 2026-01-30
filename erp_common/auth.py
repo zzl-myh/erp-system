@@ -2,7 +2,7 @@
 FastAPI 认证依赖
 """
 
-from typing import List, Optional
+from typing import Callable, List, Optional, Set
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -14,12 +14,16 @@ from erp_common.utils.jwt_utils import decode_token
 # HTTP Bearer 认证
 security = HTTPBearer(auto_error=False)
 
+# 权限缓存（用户ID -> 权限编码集合）
+_permission_cache: dict[int, Set[str]] = {}
+
 
 class CurrentUser(BaseModel):
     """当前用户信息"""
     user_id: int
     username: str
     roles: List[str] = []
+    permissions: List[str] = []  # 权限点列表
 
 
 async def get_current_user(
@@ -136,3 +140,113 @@ def require_all_roles(*roles: str):
         return user
     
     return role_checker
+
+
+# ==================== 权限点控制 ====================
+
+def set_permission_loader(loader: Callable[[int], Set[str]]):
+    """
+    设置权限加载器
+    
+    由 user_service 在启动时调用，注册权限加载函数
+    
+    Args:
+        loader: 根据用户ID返回权限编码集合的函数
+    """
+    global _permission_loader
+    _permission_loader = loader
+
+
+_permission_loader: Optional[Callable[[int], Set[str]]] = None
+
+
+def get_user_permissions(user_id: int) -> Set[str]:
+    """
+    获取用户权限点（带缓存）
+    
+    Args:
+        user_id: 用户ID
+    
+    Returns:
+        权限编码集合
+    """
+    if user_id in _permission_cache:
+        return _permission_cache[user_id]
+    
+    if _permission_loader:
+        permissions = _permission_loader(user_id)
+        _permission_cache[user_id] = permissions
+        return permissions
+    
+    return set()
+
+
+def clear_permission_cache(user_id: Optional[int] = None):
+    """
+    清除权限缓存
+    
+    Args:
+        user_id: 指定用户ID，不传则清除全部
+    """
+    if user_id:
+        _permission_cache.pop(user_id, None)
+    else:
+        _permission_cache.clear()
+
+
+def require_permissions(*required_permissions: str):
+    """
+    权限点校验装饰器
+    
+    要求用户拥有指定的权限点（任一即可）
+    
+    Usage:
+        @app.delete("/user/{id}")
+        async def delete_user(
+            user: CurrentUser = Depends(require_permissions("user:delete"))
+        ):
+            pass
+    """
+    async def permission_checker(
+        user: CurrentUser = Depends(get_current_user)
+    ) -> CurrentUser:
+        # ADMIN 拥有所有权限
+        if "ADMIN" in user.roles:
+            return user
+        
+        # 获取用户权限
+        user_permissions = get_user_permissions(user.user_id)
+        
+        # 检查是否拥有任一所需权限
+        if not any(perm in user_permissions for perm in required_permissions):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission denied. Required permissions: {required_permissions}"
+            )
+        
+        return user
+    
+    return permission_checker
+
+
+def require_all_permissions(*required_permissions: str):
+    """
+    要求拥有所有指定权限点
+    """
+    async def permission_checker(
+        user: CurrentUser = Depends(get_current_user)
+    ) -> CurrentUser:
+        if "ADMIN" in user.roles:
+            return user
+        
+        user_permissions = get_user_permissions(user.user_id)
+        
+        if not all(perm in user_permissions for perm in required_permissions):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission denied. Required all permissions: {required_permissions}"
+            )
+        
+        return user
+    
+    return permission_checker

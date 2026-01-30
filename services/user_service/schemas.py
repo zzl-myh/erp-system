@@ -217,5 +217,25 @@ class AuditLogQuery(PageQuery):
     end_time: Optional[datetime] = Field(None, description="结束时间")
 
 
+# ========== 权限相关 ==========
+
+class PermissionResponse(BaseModel):
+    """权限响应"""
+    id: int
+    code: str
+    name: str
+    resource: Optional[str] = None
+    action: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class RolePermissionAssign(BaseModel):
+    """角色权限分配请求"""
+    role_id: int
+    permission_codes: List[str] = Field(..., description="权限编码列表")
+
+
 # 解决循环引用
 LoginResponse.model_rebuild()

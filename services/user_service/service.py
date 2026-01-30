@@ -25,7 +25,7 @@ from erp_common.utils.jwt_utils import (
 from erp_common.utils.kafka_utils import KafkaProducer, KafkaTopics
 from erp_common.utils.redis_utils import RedisClient
 
-from .models import Org, Role, User, UserRole
+from .models import Org, Role, User, UserRole, AuditLog, Permission, RolePermission
 from .schemas import (
     LoginRequest,
     LoginResponse,
@@ -623,3 +623,93 @@ class AuditLogService:
             page=page,
             size=size
         )
+
+
+class PermissionService:
+    """权限服务"""
+    
+    def __init__(self, db: AsyncSession):
+        self.db = db
+    
+    async def get_user_permissions(self, user_id: int) -> set[str]:
+        """
+        获取用户的所有权限点
+        
+        通过 用户 -> 角色 -> 权限 的关联查询
+        
+        Args:
+            user_id: 用户ID
+        
+        Returns:
+            权限编码集合
+        """
+        # 查询用户的角色
+        role_stmt = select(UserRole.role_code).where(UserRole.user_id == user_id)
+        role_result = await self.db.execute(role_stmt)
+        role_codes = [r[0] for r in role_result.fetchall()]
+        
+        if not role_codes:
+            return set()
+        
+        # 查询角色ID
+        role_id_stmt = select(Role.id).where(Role.code.in_(role_codes))
+        role_id_result = await self.db.execute(role_id_stmt)
+        role_ids = [r[0] for r in role_id_result.fetchall()]
+        
+        if not role_ids:
+            return set()
+        
+        # 查询角色关联的权限
+        perm_stmt = (
+            select(Permission.code)
+            .join(RolePermission, Permission.id == RolePermission.permission_id)
+            .where(RolePermission.role_id.in_(role_ids))
+        )
+        perm_result = await self.db.execute(perm_stmt)
+        permissions = {r[0] for r in perm_result.fetchall()}
+        
+        return permissions
+    
+    async def list_permissions(self) -> List[Permission]:
+        """获取所有权限点"""
+        result = await self.db.execute(select(Permission).order_by(Permission.code))
+        return result.scalars().all()
+    
+    async def get_role_permissions(self, role_id: int) -> List[Permission]:
+        """获取角色的权限点"""
+        stmt = (
+            select(Permission)
+            .join(RolePermission, Permission.id == RolePermission.permission_id)
+            .where(RolePermission.role_id == role_id)
+        )
+        result = await self.db.execute(stmt)
+        return result.scalars().all()
+    
+    async def assign_role_permissions(self, role_id: int, permission_codes: List[str]) -> None:
+        """
+        为角色分配权限
+        
+        Args:
+            role_id: 角色ID
+            permission_codes: 权限编码列表
+        """
+        # 删除现有权限
+        await self.db.execute(
+            delete(RolePermission).where(RolePermission.role_id == role_id)
+        )
+        
+        if not permission_codes:
+            await self.db.commit()
+            return
+        
+        # 查询权限ID
+        perm_stmt = select(Permission).where(Permission.code.in_(permission_codes))
+        perm_result = await self.db.execute(perm_stmt)
+        permissions = perm_result.scalars().all()
+        
+        # 添加新权限
+        for perm in permissions:
+            role_perm = RolePermission(role_id=role_id, permission_id=perm.id)
+            self.db.add(role_perm)
+        
+        await self.db.commit()
