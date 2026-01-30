@@ -562,3 +562,19 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
 文件状态大小: 35 字节 
  M push_log.txt
 提交信息: 前端中文用户修复 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 03645b9] 前端中文用户修复
+ 1 file changed, 14 insertions(+)
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   2805197..03645b9  master -> master
+推送成功 
+========== 周五 2026/01/30 13:33:37.33 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 61 字节 
+ M push_log.txt
+ M web/src/stores/user.ts
+提交信息: 用户信息获取问题 

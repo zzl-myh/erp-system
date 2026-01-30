@@ -18,6 +18,8 @@ export const useUserStore = defineStore('user', () => {
     if (res.success && res.data) {
       token.value = res.data.access_token
       localStorage.setItem('token', res.data.access_token)
+      // 登录成功后获取用户信息
+      await fetchUserInfo()
       return true
     }
     return false
