@@ -194,8 +194,10 @@ async def verify_token(
         return {"error": "Invalid or expired token"}
     
     # 设置响应头（供 Nginx 转发给后端服务）
+    # 注意：HTTP 头只支持 ASCII，中文需要 URL 编码
+    from urllib.parse import quote
     response.headers["X-User-Id"] = str(token_data.user_id)
-    response.headers["X-Username"] = token_data.username
+    response.headers["X-Username"] = quote(token_data.username, safe='')
     response.headers["X-User-Roles"] = ",".join(token_data.roles)
     
     return TokenVerifyResponse(

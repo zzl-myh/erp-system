@@ -532,3 +532,19 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M services/user_service/api.py
  M services/user_service/service.py
 提交信息: 用户创建修复 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 2805197] 用户创建修复
+ 3 files changed, 31 insertions(+), 5 deletions(-)
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   bd3979c..2805197  master -> master
+推送成功 
+========== 周五 2026/01/30 13:23:30.02 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 67 字节 
+ M push_log.txt
+ M services/user_service/api.py
+提交信息: 前端中文登录问题 
