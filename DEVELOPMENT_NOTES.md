@@ -176,6 +176,57 @@ order-service:
 `docker-compose down` 不会删除 volume 数据，MySQL 数据安全。
 如需完全清除：`docker-compose down -v`（谨慎使用）
 
+### 4.3 MySQL 初始化脚本 ⚠️ 重要
+
+**配置说明**：MySQL 容器首次启动时，会按字母顺序执行 `/docker-entrypoint-initdb.d/` 目录下的 SQL 脚本。
+
+**当前配置**（docker-compose.yml）：
+
+```yaml
+mysql:
+  image: mysql:8.0
+  command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  volumes:
+    - ./scripts/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    - ./scripts/fix_role_data.sql:/docker-entrypoint-initdb.d/02_fix_role_data.sql:ro
+    - ./scripts/init_permissions.sql:/docker-entrypoint-initdb.d/03_init_permissions.sql:ro
+```
+
+**脚本执行顺序**：
+
+| 序号 | 脚本 | 说明 |
+|------|------|------|
+| 01 | `init.sql` | 创建表结构、初始化基础数据（用户、角色等） |
+| 02 | `fix_role_data.sql` | 修复角色表中文数据（确保字符集正确） |
+| 03 | `init_permissions.sql` | 初始化权限点和角色-权限关联 |
+
+**注意事项**：
+
+1. **仅首次执行**：初始化脚本只在 MySQL 数据目录为空时执行，已有数据时不会重新执行
+2. **外键约束**：`init_permissions.sql` 中需先禁用外键检查 `SET FOREIGN_KEY_CHECKS=0`
+3. **字符集**：必须配置 `--character-set-server=utf8mb4` 避免中文乱码
+
+**新增初始化脚本规范**：
+
+```sql
+-- 脚本开头
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ... 业务 SQL ...
+
+-- 脚本结尾
+SET FOREIGN_KEY_CHECKS = 1;
+SELECT '初始化完成' AS result;
+```
+
+**已有环境手动执行**：
+
+```bash
+# 修复现有数据
+docker exec -i erp-mysql-1 mysql -uroot -pX7kL9mP2qR5tlyzm erp < scripts/fix_role_data.sql
+docker exec -i erp-mysql-1 mysql -uroot -pX7kL9mP2qR5tlyzm erp < scripts/init_permissions.sql
+```
+
 ---
 
 ## 5. 数据库设计

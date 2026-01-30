@@ -38,9 +38,12 @@ services:
       MYSQL_DATABASE: erp
     ports:
       - "3306:3306"
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+      - ./scripts/fix_role_data.sql:/docker-entrypoint-initdb.d/02_fix_role_data.sql:ro
+      - ./scripts/init_permissions.sql:/docker-entrypoint-initdb.d/03_init_permissions.sql:ro
     networks:
       - erp-network
     restart: unless-stopped
