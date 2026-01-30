@@ -323,3 +323,23 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
 ?? web/src/views/user/role.vue
 ?? "\346\250\241\345\235\227\344\274\230\345\214\226\347\202\271.txt"
 提交信息: 用户前端构建以及用户后端API完善 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 97ebf79] 用户前端构建以及用户后端API完善
+ 14 files changed, 1948 insertions(+), 19 deletions(-)
+ create mode 100644 web/src/views/user/org.vue
+ create mode 100644 web/src/views/user/role.vue
+ create mode 100644 "\346\250\241\345\235\227\344\274\230\345\214\226\347\202\271.txt"
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   c11d4f0..97ebf79  master -> master
+推送成功 
+========== 周五 2026/01/30 10:04:31.08 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 87 字节 
+ M nginx/nginx.conf
+ M push_log.txt
+ M services/user_service/api.py
+提交信息: 用户网关和utf8乱码问题 

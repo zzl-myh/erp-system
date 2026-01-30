@@ -224,33 +224,6 @@ async def get_current_user_info(
     return Result.ok(data=response)
 
 
-@router.get("/{user_id}", response_model=Result[UserResponse], summary="获取用户详情")
-async def get_user(
-    user_id: int,
-    db: AsyncSession = Depends(get_db),
-    service: UserService = Depends(get_user_service),
-    user: CurrentUser = Depends(get_current_user),
-):
-    """根据ID获取用户详情"""
-    user_info = await service.get_user(user_id)
-    response = await enrich_user_roles(user_info, db)
-    return Result.ok(data=response)
-
-
-@router.put("/{user_id}", response_model=Result[UserResponse], summary="更新用户")
-async def update_user(
-    user_id: int,
-    data: UserUpdate,
-    db: AsyncSession = Depends(get_db),
-    service: UserService = Depends(get_user_service),
-    user: CurrentUser = Depends(require_roles("ADMIN")),
-):
-    """更新用户信息（需要管理员权限）"""
-    updated_user = await service.update_user(user_id, data, operator=user.username)
-    response = await enrich_user_roles(updated_user, db)
-    return Result.ok(data=response)
-
-
 @router.get("/list", response_model=Result[PageResult[UserResponse]], summary="用户列表")
 async def list_users(
     keyword: str = Query(None, description="关键词搜索"),
@@ -345,17 +318,6 @@ async def reset_password(
     """管理员重置用户密码"""
     await service.reset_password(data.user_id, data.new_password)
     return Result.ok(message="Password reset successfully")
-
-
-@router.delete("/{user_id}", response_model=Result, summary="删除用户")
-async def delete_user(
-    user_id: int,
-    service: UserService = Depends(get_user_service),
-    user: CurrentUser = Depends(require_roles("ADMIN")),
-):
-    """删除用户（管理员权限）"""
-    await service.delete_user(user_id)
-    return Result.ok(message="User deleted successfully")
 
 
 # ==================== 角色接口 ====================
@@ -485,3 +447,43 @@ async def list_audit_logs(
         size=size
     )
     return Result.ok(data=result)
+
+
+# ==================== 用户路径参数接口（必须放在最后） ====================
+
+@router.get("/{user_id}", response_model=Result[UserResponse], summary="获取用户详情")
+async def get_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    service: UserService = Depends(get_user_service),
+    user: CurrentUser = Depends(get_current_user),
+):
+    """根据ID获取用户详情"""
+    user_info = await service.get_user(user_id)
+    response = await enrich_user_roles(user_info, db)
+    return Result.ok(data=response)
+
+
+@router.put("/{user_id}", response_model=Result[UserResponse], summary="更新用户")
+async def update_user(
+    user_id: int,
+    data: UserUpdate,
+    db: AsyncSession = Depends(get_db),
+    service: UserService = Depends(get_user_service),
+    user: CurrentUser = Depends(require_roles("ADMIN")),
+):
+    """更新用户信息（需要管理员权限）"""
+    updated_user = await service.update_user(user_id, data, operator=user.username)
+    response = await enrich_user_roles(updated_user, db)
+    return Result.ok(data=response)
+
+
+@router.delete("/{user_id}", response_model=Result, summary="删除用户")
+async def delete_user(
+    user_id: int,
+    service: UserService = Depends(get_user_service),
+    user: CurrentUser = Depends(require_roles("ADMIN")),
+):
+    """删除用户（管理员权限）"""
+    await service.delete_user(user_id)
+    return Result.ok(message="User deleted successfully")
