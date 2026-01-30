@@ -98,10 +98,15 @@ def get_permission_service(
 async def enrich_user_roles(user, db: AsyncSession) -> UserResponse:
     """丰富用户角色信息"""
     from sqlalchemy import select
-    from .models import Role
+    from sqlalchemy.orm import selectinload
+    from .models import Role, UserRole
     
-    # 获取用户的角色编码
-    role_codes = [r.role_code for r in user.roles]
+    # 直接查询用户的角色（避免懒加载问题）
+    user_roles_result = await db.execute(
+        select(UserRole).where(UserRole.user_id == user.id)
+    )
+    user_roles = user_roles_result.scalars().all()
+    role_codes = [r.role_code for r in user_roles]
     
     # 查询角色详情
     roles_data = []

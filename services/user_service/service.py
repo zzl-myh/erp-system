@@ -61,9 +61,13 @@ class AuthService:
         Returns:
             登录响应（包含 Token）
         """
-        # 1. 查询用户
+        from sqlalchemy.orm import selectinload
+        
+        # 1. 查询用户（预加载角色）
         result = await self.db.execute(
-            select(User).where(User.username == data.username)
+            select(User)
+            .options(selectinload(User.roles))
+            .where(User.username == data.username)
         )
         user = result.scalar_one_or_none()
         
