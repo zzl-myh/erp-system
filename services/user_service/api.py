@@ -470,15 +470,15 @@ async def list_permissions(
     return Result.ok(data=[PermissionResponse.model_validate(p) for p in permissions])
 
 
-@router.get("/permission/role/{role_id}", response_model=Result[list[PermissionResponse]], summary="角色权限")
+@router.get("/permission/role/{role_id}", response_model=Result[list[str]], summary="角色权限")
 async def get_role_permissions(
     role_id: int,
     service: PermissionService = Depends(get_permission_service),
     user: CurrentUser = Depends(get_current_user),
 ):
-    """获取角色的权限点"""
+    """获取角色的权限点编码列表"""
     permissions = await service.get_role_permissions(role_id)
-    return Result.ok(data=[PermissionResponse.model_validate(p) for p in permissions])
+    return Result.ok(data=[p.code for p in permissions])
 
 
 @router.post("/permission/assign", response_model=Result, summary="分配角色权限")

@@ -497,3 +497,21 @@ origin	https://github.com/zzl-myh/erp-system.git (push)
  M scripts/init.sql
  M scripts/init_permissions.sql
 提交信息: 修复乱码问题 
+warning: in the working copy of 'push_log.txt', LF will be replaced by CRLF the next time Git touches it
+[master 6e23a11] 修复乱码问题
+ 4 files changed, 32 insertions(+)
+执行: git push origin master 
+To https://github.com/zzl-myh/erp-system.git
+   0d8e380..6e23a11  master -> master
+推送成功 
+========== 周五 2026/01/30 11:32:04.52 ========== 
+========== ERP 代码推送 ========== 
+当前分支: master 
+origin	https://github.com/zzl-myh/erp-system.git (fetch)
+origin	https://github.com/zzl-myh/erp-system.git (push)
+文件状态大小: 121 字节 
+ M push_log.txt
+ M services/user_service/api.py
+ M web/src/api/user.ts
+ M web/src/views/user/role.vue
+提交信息: 角色权限配置 

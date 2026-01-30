@@ -166,6 +166,41 @@ export function deleteRole(roleId: number): Promise<ApiResult<null>> {
   return del<null>(`/user/role/${roleId}`)
 }
 
+// ==================== 权限接口 ====================
+
+export interface Permission {
+  id: number
+  code: string
+  name: string
+  resource: string
+  action: string
+}
+
+export interface RolePermissionAssign {
+  role_id: number
+  permission_codes: string[]
+}
+
+// 获取所有权限点
+export function getPermissionList(): Promise<ApiResult<Permission[]>> {
+  return get<Permission[]>('/user/permission/list')
+}
+
+// 获取当前用户权限
+export function getMyPermissions(): Promise<ApiResult<string[]>> {
+  return get<string[]>('/user/permission/me')
+}
+
+// 获取角色权限
+export function getRolePermissions(roleId: number): Promise<ApiResult<string[]>> {
+  return get<string[]>(`/user/permission/role/${roleId}`)
+}
+
+// 为角色分配权限
+export function assignRolePermissions(data: RolePermissionAssign): Promise<ApiResult<null>> {
+  return post<null>('/user/permission/assign', data)
+}
+
 // ==================== 组织接口 ====================
 
 export interface Org {
