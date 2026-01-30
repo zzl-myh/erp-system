@@ -1,6 +1,10 @@
 -- 权限点初始化数据
 -- 执行方式: docker exec -i erp-mysql-1 mysql -uroot -pX7kL9mP2qR5tlyzm erp < scripts/init_permissions.sql
 
+-- 设置字符集（关键！）
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- 禁用外键检查
 SET FOREIGN_KEY_CHECKS = 0;
 

@@ -1,6 +1,10 @@
 -- ERP System 数据库初始化脚本
 -- 适用于 MySQL 8.0+
 
+-- 设置字符集（关键！）
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- 创建数据库
 CREATE DATABASE IF NOT EXISTS erp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE erp;

@@ -1,6 +1,10 @@
 -- 修复角色表中文数据
 -- 执行方式: docker exec -i erp-mysql-1 mysql -uroot -pX7kL9mP2qR5tlyzm erp < scripts/fix_role_data.sql
 
+-- 设置字符集（关键！）
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- 更新角色数据
 UPDATE role SET name = '系统管理员', description = '拥有全部权限' WHERE code = 'ADMIN';
 UPDATE role SET name = '门店店长', description = '门店管理、销售、库存查询' WHERE code = 'STORE_MANAGER';
